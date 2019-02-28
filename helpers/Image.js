@@ -1,17 +1,17 @@
-module.exports = class Image{
-    constructor(serie, fColor='white', bColor='black', logic='base'){
+module.exports = class Image {
+    constructor(serie, fColor = 'white', bColor = 'black', logic = 'base') {
         this.serie = serie;
         logic = this.logicConv(logic);
         this.logic = new logic(this.serie);
         this.colors = Image.colorToAnsi(fColor, bColor)
     }
 
-    get img(){
+    get img() {
         return this.colors + this.logic.img + "\x1b[0m";
     }
 
-    colorConv(color){
-        switch(color){
+    colorConv(color) {
+        switch (color) {
             case "red":
                 return "\x1b[31m";
             case "green":
@@ -31,8 +31,8 @@ module.exports = class Image{
         }
     }
 
-    logicConv(logic){
-        switch(logic){
+    logicConv(logic) {
+        switch (logic) {
             case "random":
                 return RandomLogic;
             default:
@@ -55,7 +55,7 @@ module.exports = class Image{
         return r * 36 + g * 6 + b * 1 + 16;
     }
 
-    static get CACHE(){
+    static get CACHE() {
         return {
             "black": [0, 0, 0],
             "navy": [0, 0, 128],
@@ -250,8 +250,8 @@ module.exports = class Image{
 
 
 
-class BaseLogic{
-    constructor(serie){
+class BaseLogic {
+    constructor(serie) {
         this.serie = serie;
         //-1 because we increase before returning
         this.current = -1;
@@ -259,24 +259,24 @@ class BaseLogic{
 
     get img() {
         this.current++;
-        if (this.current >= this.serie.length*10) {
+        if (this.current >= this.serie.length * 10) {
             this.current = 0;
         }
-        return this.serie[Math.floor(this.current/10)];
+        return this.serie[Math.floor(this.current / 10)];
     }
 }
 
-class RandomLogic{
-    constructor(serie){
+class RandomLogic {
+    constructor(serie) {
         this.serie = serie;
     }
 
-    get img(){
-        return this.serie[this.getRandomIntInclusive(0,this.serie.length-1)];
+    get img() {
+        return this.serie[this.getRandomIntInclusive(0, this.serie.length - 1)];
     }
 
     getRandomIntInclusive(min, max) {
-        if(typeof max === 'undefined'){
+        if (typeof max === 'undefined') {
             max = min;
             min = 1;
         }
