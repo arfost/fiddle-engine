@@ -1,4 +1,5 @@
 const readline = require('readline');
+const components = require('./out-compo/OutsideComponents.js');
 module.exports = class Outside {
     constructor() {
         this.errorMode = 0;
@@ -15,19 +16,42 @@ module.exports = class Outside {
         } catch (e) {
             this.errorMode = 1;
         }
-        process.stdout.on('resize', () => this.isResized());
+        process.stdout.on('resize', this.isResized.bind(this));
 
         this.lastInput = false;
-        process.stdin.on('keypress', (str, details) => this.keyPressed(str, details));
+        process.stdin.on('keypress', this.keyPressed.bind(this));
+
         this.isResized();
     }
 
     keyPressed(str, details) {
-        //console.log(str, details);
+        //console.Logs.js(str, details);
         this.lastInput = this.turnActionAssoc[str];
         if (str === "p") {
             process.exit(0);
         }
+    }
+
+    initInterface(){
+        //console.log("init")
+        this.interface = {};
+        this.interface.title = new components.SimpleTitle({x: 0, y: 0}, {rows: 3, columns: process.stdout.columns});
+        this.interface.title.newDatas("Super titre");
+        //this.interface.screen = new components.ScreenMap({x: 0, y: 4}, {rows: 30, columns: 30});
+        //this.interface.screen.newDatas(null);
+    }
+
+    checkInterface(){
+        if(this.interface){
+            this.updateInterface();
+        }else{
+            this.initInterface();
+        }
+    }
+
+    updateInterface(){
+        this.interface.title.updateSize({rows: 3, columns: this.size.columns});
+        this.interface.title.newDatas("Super titre ["+this.size.columns+";"+this.size.rows+"]");
     }
 
     isResized() {
@@ -39,6 +63,7 @@ module.exports = class Outside {
                 rows: process.stdout.rows
             };
             process.stdout.write("\u001b[2J\u001b[0;0H");
+            this.checkInterface();
             this.errorMode = 0;
         }
     }
@@ -69,40 +94,57 @@ module.exports = class Outside {
             return;
         }
 
-        let title = this.normalizeTextLines(gameInfos.gameInfos + ` (${this.size.columns}x${this.size.rows})`, this.size.columns, 3);
+        //this.interface.screen.newDatas(gameInfos.stageInfos);
 
-        let visualPart = this.createVisualPart(gameInfos.stageInfos, Math.floor(this.size.columns * 0.66), Math.floor((this.size.rows - 8) * 0.66), true);
+
+        //let visualPart = this.createVisualPart(gameInfos.stageInfos, Math.floor(this.size.columns * 0.66), Math.floor((this.size.rows - 8) * 0.66), true);
 
         let preparedActions = this.prepareAction(gameInfos.stageInfos.actions);
         let actionText = this.normalizeTextLines(preparedActions, Math.floor(this.size.columns * 0.33), Math.floor((this.size.rows - 8) * 0.66));
-        let mergedVisualAction = this.mergePart(visualPart, actionText.split("\n"));
+        //let mergedVisualAction = this.mergePart(visualPart, actionText.split("\n"));
 
         let logText = this.normalizeTextLines(gameInfos.stageInfos.gameLog, this.size.columns, Math.floor((this.size.rows - 8) * 0.33));
 
         //process.stdout.write("\u001b[2J");
-        process.stdout.write("\u001b[0;0H");
-        process.stdout.write(title + mergedVisualAction + "\n" + logText);
-        process.stdout.write("\x1b[0m");
+        //process.stdout.write("\u001b[0;4H");
+        //process.stdout.write(mergedVisualAction + "\n" + logText);
+        //process.stdout.write("\x1b[0m");
     }
 
     prepareAction(actions) {
 
-        let formattedActions = [...this.normalizeSoloLine("Actions : ", Math.floor(this.size.columns * 0.33) - 2, 1)];
+        let formattedActions = [...this.normalizeSoloLine("Actions : ", Math.floor(this.size.columns * 0.33) - 2, 1), " ", this.normalizeSoloLine("principales : ", Math.floor(this.size.columns * 0.33) - 2, 1)];
         let turnActionAssoc = {};
         let keys = this.keysForBinding;
 
-        actions = actions.sort((a, b) => (a.key > b.key) ? 1 : -1)
+        let sortedSecondaryActions = {};
+
+        actions = actions.sort((a, b) => (a.key < b.key) ? -1 : 1);
 
         for (let action of actions) {
             let key;
             if (keys.preferedAssociations[action.key]) {
                 key = keys.preferedAssociations[action.key];
+                turnActionAssoc[key] = action;
+                formattedActions.push(` - ${key} : ${action.name}[${action.pos.x};${action.pos.y}]`);
             } else {
-                key = keys.vrac.pop();
+                if (!sortedSecondaryActions[action.key.split(':')[0]]) {
+                    sortedSecondaryActions[action.key.split(':')[0]] = [];
+                }
+                sortedSecondaryActions[action.key.split(':')[0]].push(action)
             }
-            turnActionAssoc[key] = action;
-            formattedActions.push(` - ${key} : ${action.name}[${action.pos.x};${action.pos.y}]`);
         }
+
+        for (let cat in sortedSecondaryActions) {
+            formattedActions = formattedActions.concat([" ", this.normalizeSoloLine("---", Math.floor(this.size.columns * 0.33) - 2, 1)]);
+
+            for (let action of sortedSecondaryActions[cat]) {
+                let key = keys.vrac.pop();
+                turnActionAssoc[key] = action;
+                formattedActions.push(` - ${key} : ${action.name}[${action.pos.x};${action.pos.y}]`);
+            }
+        }
+
         this.turnActionAssoc = turnActionAssoc;
         return formattedActions;
     }
@@ -114,7 +156,10 @@ module.exports = class Outside {
                 "t",
                 "y",
                 "u",
-                "f"
+                "f",
+                "g",
+                "h",
+                "j"
             ],
             preferedAssociations: {
                 "mv:up": "z",
@@ -129,45 +174,11 @@ module.exports = class Outside {
         let max = left.length > right.length ? left.length : right.length;
         let merged = [];
         for (let i = 0; i < max; i++) {
-            let lineLeft = left[i] ? left[i] : " ".repeat();
+            let lineLeft = left[i] ? left[i] : " ";
             let lineRight = right[i] ? right[i] : " ";
             merged.push(lineLeft + mergeChar + lineRight)
         }
         return merged.join('\n');
-    }
-
-    get affChars() {
-        return {
-            bordureVisualHori: "=",
-            bordureVisualVerti: "|"
-        }
-    }
-
-    createVisualPart(infos, columns, rows, doubledColumns = false) {
-
-        let doubled = (doubledColumns ? " " : "");
-        columns = Math.floor(columns / (doubledColumns ? 2 : 1)) - 2;
-
-        let base = new Array(rows).fill(0);
-        base = base.map(() => {
-            let row = new Array(columns).fill(0);
-            return row.map(() => infos.baseFloor.img + doubled);
-        });
-        let playerRelX = Math.ceil(infos.basePos.x - columns / 2);
-        let playerRelY = Math.ceil(infos.basePos.y - rows / 2);
-
-        for (let entity of infos.entities) {
-            base[entity.pos.y - playerRelY][entity.pos.x - playerRelX] = doubled + entity.img;
-        }
-        base.unshift(new Array(base[0].length).fill((doubledColumns ? this.affChars['bordureVisualHori'] : "") + this.affChars['bordureVisualHori']));
-        base.push(new Array(base[0].length).fill((doubledColumns ? this.affChars['bordureVisualHori'] : "") + this.affChars['bordureVisualHori']));
-        base = base.map((d) => {
-            return this.affChars['bordureVisualVerti'] + this.affChars['bordureVisualVerti'] +
-                d.join('') +
-                this.affChars['bordureVisualVerti'] + this.affChars['bordureVisualVerti'];
-        });
-
-        return base;
     }
 
     normalizeTextLines(lines, columns, rows) {
@@ -184,7 +195,12 @@ module.exports = class Outside {
         let tranLines = [];
         for (let line of lines) {
             if (line.length <= columns) {
-                tranLines.push(line.padEnd(columns));
+                try {
+                    tranLines.push(line.padEnd(columns));
+                } catch (e) {
+                    tranLines.push("error");
+                }
+
             } else if (line.length > columns) {
                 tranLines.push(`${line.substring(0, columns)}`);
                 tranLines.push(`${line.substring(columns)}`);
