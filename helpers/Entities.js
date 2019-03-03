@@ -52,9 +52,9 @@ class Entity {
     emit(name, event) {
         let result;
         for (let handler of this._events[name]) {
-            result = handler(event, this)
+            event = handler(event, result, this)
         }
-        return result;
+        return event;
     }
 
     isVisible() {
@@ -157,8 +157,8 @@ class Component {
 
         for (let statToAdd of this.statsToAdd) {
             this.entity.addStat(statToAdd);
-            this.entity.subscribeTo('get_' + statToAdd, function () {
-                return this[statToAdd]
+            this.entity.subscribeTo('get_' + statToAdd, function (event) {
+                return event += this[statToAdd]
             }.bind(this));
         }
     }
@@ -169,6 +169,10 @@ class BaseApparence extends Component {
     constructor(params) {
         super();
         this.desc = params.desc
+    }
+
+    get statsToAdd() {
+        return ["desc"]
     }
 
     getAction(against) {
@@ -192,10 +196,11 @@ class Eyes extends Component {
     constructor(params) {
         super();
         this.perception = params.perception || 5;
+        this.desc = " avec " + this.perception + " en perception"
     }
 
     get statsToAdd() {
-        return ["perception"]
+        return ["perception", "desc"]
     }
 
 }

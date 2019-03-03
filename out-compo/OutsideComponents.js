@@ -214,6 +214,7 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
                 return row.map(() => doubled + " ").join("");
             });
         }
+        let cursorText = infos.baseDesc;
 
         let base = new Array(rows).fill(0);
         base = base.map(() => {
@@ -224,12 +225,14 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
         let playerRelY = Math.ceil(infos.basePos.y - rows / 2);
 
         for (let entity of infos.entities) {
-            base[entity.pos.y - playerRelY][entity.pos.x - playerRelX] =
-                doubled + entity.img;
+            base[entity.pos.y - playerRelY][entity.pos.x - playerRelX] = doubled + entity.img;
+            if (entity.pos.y - playerRelY === this.cursorPos.y && entity.pos.x - playerRelX === this.cursorPos.x) {
+                cursorText = entity.stats.desc;
+            }
         }
 
-        console.log(base.length)
-        console.log(base[0].length)
+        //console.log(base.length)
+        //console.log(base[0].length)
         //add cursor
         base[this.cursorPos.y][this.cursorPos.x] = doubled + "é"
 
@@ -255,7 +258,7 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
             );
         });
 
-        base.push(this.decorateLine(("  " + "un texte de test qui sert a tester").padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
+        base.push(this.decorateLine(("  " + cursorText).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
             this.affChars["bordureVisualVerti"]));
         while (base.length < this.size.rows - 1) {
             base.push(this.decorateLine(" ".repeat(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +

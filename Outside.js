@@ -32,7 +32,7 @@ module.exports = class Outside {
         if (details.ctrl) {
             str = "ctrl:" + str;
         }
-        console.log(str)
+        //console.log(str)
         let input = this.turnActionAssoc[str];
         if (input && input.forComponent) {
             input.execute();
