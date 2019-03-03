@@ -4,7 +4,7 @@ module.exports = class Outside {
     constructor() {
         this.errorMode = 0;
         this.minSize = {
-            rows: 30,
+            rows: 44,
             columns: 70
         };
         try {
@@ -25,33 +25,81 @@ module.exports = class Outside {
     }
 
     keyPressed(str, details) {
-        //console.Logs.js(str, details);
-        this.lastInput = this.turnActionAssoc[str];
+
         if (str === "p") {
             process.exit(0);
         }
+        if (details.ctrl) {
+            str = "ctrl:" + str;
+        }
+        console.log(str)
+        let input = this.turnActionAssoc[str];
+        if (input && input.forComponent) {
+            input.execute();
+        } else {
+            this.lastInput = input;
+        }
     }
 
-    initInterface(){
+    initInterface() {
         //console.log("init")
         this.interface = {};
-        this.interface.title = new components.SimpleTitle({x: 0, y: 0}, {rows: 3, columns: process.stdout.columns});
+        this.interface.title = new components.SimpleTitle({
+            x: 0,
+            y: 0
+        }, {
+            rows: 3,
+            columns: process.stdout.columns
+        });
         this.interface.title.newDatas("Super titre");
-        //this.interface.screen = new components.ScreenMap({x: 0, y: 4}, {rows: 30, columns: 30});
-        //this.interface.screen.newDatas(null);
+        this.interface.screen = new components.ScreenMap({
+            x: 3,
+            y: 0
+        }, {
+            rows: 35,
+            columns: 30
+        });
+        this.interface.screen.newDatas(null);
+        this.interface.logs = new components.Logs({
+            x: 38,
+            y: 0
+        }, {
+            rows: 10,
+            columns: process.stdout.columns
+        });
+        this.interface.logs.newDatas(["loading"]);
+        this.interface.actions = new components.Actions({
+            x: 3,
+            y: 60
+        }, {
+            rows: 35,
+            columns: process.stdout.columns - 60
+        });
+        this.interface.actions.newDatas([]);
     }
 
-    checkInterface(){
-        if(this.interface){
+    checkInterface() {
+        if (this.interface) {
             this.updateInterface();
-        }else{
+        } else {
             this.initInterface();
         }
     }
 
-    updateInterface(){
-        this.interface.title.updateSize({rows: 3, columns: this.size.columns});
-        this.interface.title.newDatas("Super titre ["+this.size.columns+";"+this.size.rows+"]");
+    updateInterface() {
+        this.interface.title.updateSize({
+            rows: 3,
+            columns: this.size.columns
+        });
+        this.interface.title.newDatas("Super titre [" + this.size.columns + ";" + this.size.rows + "]");
+        this.interface.logs.updateSize({
+            rows: 10,
+            columns: this.size.columns
+        });
+        this.interface.actions.updateSize({
+            rows: 35,
+            columns: process.stdout.columns - 60
+        });
     }
 
     isResized() {
@@ -94,21 +142,37 @@ module.exports = class Outside {
             return;
         }
 
-        //this.interface.screen.newDatas(gameInfos.stageInfos);
+        this.interface.screen.newDatas(gameInfos.stageInfos);
+        this.interface.logs.newDatas(gameInfos.stageInfos.gameLog);
+        this.interface.actions.newDatas(gameInfos.stageInfos.actions);
+
+        let keysDemands = [];
+        keysDemands = keysDemands.concat(this.interface.logs.hasKeyToBind())
+        keysDemands = keysDemands.concat(this.interface.actions.hasKeyToBind())
+        keysDemands = keysDemands.concat(this.interface.screen.hasKeyToBind())
 
 
         //let visualPart = this.createVisualPart(gameInfos.stageInfos, Math.floor(this.size.columns * 0.66), Math.floor((this.size.rows - 8) * 0.66), true);
 
-        let preparedActions = this.prepareAction(gameInfos.stageInfos.actions);
-        let actionText = this.normalizeTextLines(preparedActions, Math.floor(this.size.columns * 0.33), Math.floor((this.size.rows - 8) * 0.66));
+        //this.prepareAction(gameInfos.stageInfos.actions);
+        this.bindKeysToAction(keysDemands);
         //let mergedVisualAction = this.mergePart(visualPart, actionText.split("\n"));
-
-        let logText = this.normalizeTextLines(gameInfos.stageInfos.gameLog, this.size.columns, Math.floor((this.size.rows - 8) * 0.33));
 
         //process.stdout.write("\u001b[2J");
         //process.stdout.write("\u001b[0;4H");
         //process.stdout.write(mergedVisualAction + "\n" + logText);
         //process.stdout.write("\x1b[0m");
+    }
+
+    bindKeysToAction(actionToBind) {
+        let turnActionAssoc = {};
+        for (let action of actionToBind) {
+            if (!action)
+                continue;
+
+            turnActionAssoc[action.key] = action;
+        }
+        this.turnActionAssoc = turnActionAssoc;
     }
 
     prepareAction(actions) {

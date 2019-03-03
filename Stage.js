@@ -5,6 +5,7 @@ module.exports = class Stage {
     constructor(params, player) {
         this.params = params;
         this.baseFloor = new Image(["."], "#666");
+        this.baseDesc = "un endroit vide"
         this.posEntities = [];
         this.entities = [];
         this.logGameAction = ["Vous entrez dans le stage de test"];
@@ -70,7 +71,7 @@ module.exports = class Stage {
                     if (possible) {
                         let modifier = action.modifiers(pos, content, player);
                         action.name += modifier.nameModifier;
-                        action.key += ":" + modifier.keyModifier;
+                        action.id += ":" + modifier.idModifier;
                         action.pos = pos;
                         actions.push(action)
                     }
@@ -83,7 +84,7 @@ module.exports = class Stage {
     get possibleAction() {
         return [{
                 name: "move",
-                key: "mv",
+                id: "mv",
                 condition: [
                     function (pos, content, player) {
                         return content === undefined;
@@ -97,22 +98,22 @@ module.exports = class Stage {
                     switch (result) {
                         case "1;0":
                             return {
-                                keyModifier: "rg",
+                                idModifier: "rg",
                                 nameModifier: " right"
                             };
                         case "-1;0":
                             return {
-                                keyModifier: "lf",
+                                idModifier: "lf",
                                 nameModifier: " left"
                             };
                         case "0;1":
                             return {
-                                keyModifier: "dw",
+                                idModifier: "dw",
                                 nameModifier: " down"
                             };
                         case "0;-1":
                             return {
-                                keyModifier: "up",
+                                idModifier: "up",
                                 nameModifier: " up"
                             };
                         default:
@@ -128,7 +129,7 @@ module.exports = class Stage {
             },
             {
                 name: "run",
-                key: "rn",
+                id: "rn",
                 condition: [
                     function (pos, content, player) {
                         return content === undefined;
@@ -142,22 +143,22 @@ module.exports = class Stage {
                     switch (result) {
                         case "2;0":
                             return {
-                                keyModifier: "rg",
+                                idModifier: "rg",
                                 nameModifier: " right"
                             };
                         case "-2;0":
                             return {
-                                keyModifier: "lf",
+                                idModifier: "lf",
                                 nameModifier: " left"
                             };
                         case "0;2":
                             return {
-                                keyModifier: "dw",
+                                idModifier: "dw",
                                 nameModifier: " down"
                             };
                         case "0;-2":
                             return {
-                                keyModifier: "up",
+                                idModifier: "up",
                                 nameModifier: " up"
                             };
                         default:
@@ -192,7 +193,8 @@ module.exports = class Stage {
             basePos: this.player.pos,
             entities: [],
             baseFloor: this.baseFloor,
-            gameLog: this.logGameAction.slice(-10),
+            baseDesc: this.baseDesc,
+            gameLog: this.logGameAction,
             actions: this.actions
         };
 

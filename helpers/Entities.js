@@ -83,17 +83,17 @@ class Entity {
     }
 
     getPossibleActionsFor(entity) {
-        console.log("//////////" + this.constructor.name);
+        //console.log("//////////" + this.constructor.name);
         let actions = [];
         for (let component of this.components.values()) {
-            console.log("--- " + component.constructor.name);
+            //console.log("--- " + component.constructor.name);
             let tmpAct = component.getAction(entity);
-            console.log(tmpAct);
+            //console.log(tmpAct);
             actions = actions.concat(tmpAct);
-            console.log(actions)
+            //console.log(actions)
         }
-        console.log("fin")
-        console.log(actions)
+        //console.log("fin")
+        //console.log(actions)
         return actions;
     }
 
@@ -172,11 +172,11 @@ class BaseApparence extends Component {
     }
 
     getAction(against) {
-        console.log("perce" + against.getStat("perception"))
+        //console.log("perce" + against.getStat("perception"))
         if (against.getStat("perception") > 0) {
             return [{
                 name: "look at",
-                key: "lk:" + this.entity.constructor.name,
+                id: "lk:" + this.entity.constructor.name,
                 pos: this.entity.pos,
                 execute: (stage, content, player) => {
                     stage.logGameAction.push(String(this.desc))
