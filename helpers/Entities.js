@@ -125,9 +125,7 @@ class Player extends Entity {
         this.addComponent(new BaseApparence({
             desc: "un joueur sexy et musclé"
         }))
-        this.addComponent(new Eyes({
-            perception: 6
-        }))
+        this.addComponent(new BaseStats())
     }
 
     interact(player) {
@@ -177,19 +175,6 @@ class BaseApparence extends Component {
         return ["desc"]
     }
 }
-class Eyes extends Component {
-
-    constructor(params) {
-        super();
-        this.perception = params.perception || 5;
-        this.desc = " avec " + this.perception + " en perception"
-    }
-
-    get statsToAdd() {
-        return ["perception", "desc"]
-    }
-
-}
 
 class Dialog extends Component {
 
@@ -202,6 +187,47 @@ class Dialog extends Component {
 
     get statsToAdd() {
         return ["desc"]
+    }
+
+    getAction(against) {
+        let actions = [];
+        for (let repli of this.steps[this.step].replis) {
+            actions.push({
+                name: "say : " + repli.text,
+                id: "say:" + this.step + ":" + repli.code,
+                pos: this.entity.pos,
+                execute: (stage, content, player) => {
+                    stage.logGameAction.push(String("you say : " + repli.text));
+                    this.step = repli.next;
+                    stage.logGameAction.push(String(this.entity.name + " say : " + this.steps[this.step].text));
+                }
+            })
+        }
+        return actions;
+    }
+
+}
+
+class BaseStats extends Component {
+
+    constructor(params) {
+        super();
+        this.physique = 5;
+        this.mental = 5;
+        this.santée = 8;
+    }
+
+    get statsToAdd() {
+        return ["physique", "mental"]
+    }
+
+    get eventsToSubscribe() {
+        return [{
+            name: 'get_perception',
+            handler: (event => {
+                return this.mental * 2;
+            })
+        }]
     }
 
     getAction(against) {
