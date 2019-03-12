@@ -111,8 +111,10 @@ class Thing extends Entity {
     constructor(entity) {
         super(entity);
         this.addComponent(new BaseApparence({
-            desc: "un bidon de demonstration"
+            desc: "Un vieu tout pourri"
         }));
+        this.name = 'un vieu'
+        this.addComponent(new Dialog(require('./../refs/dialogs/test.json')));
     }
 }
 
@@ -174,22 +176,6 @@ class BaseApparence extends Component {
     get statsToAdd() {
         return ["desc"]
     }
-
-    getAction(against) {
-        //console.log("perce" + against.getStat("perception"))
-        if (against.getStat("perception") > 0) {
-            return [{
-                name: "look at",
-                id: "lk:" + this.entity.constructor.name,
-                pos: this.entity.pos,
-                execute: (stage, content, player) => {
-                    stage.logGameAction.push(String(this.desc))
-                }
-            }]
-        } else {
-            return [];
-        }
-    }
 }
 class Eyes extends Component {
 
@@ -201,6 +187,38 @@ class Eyes extends Component {
 
     get statsToAdd() {
         return ["perception", "desc"]
+    }
+
+}
+
+class Dialog extends Component {
+
+    constructor(params) {
+        super();
+        this.step = "base";
+        this.desc = params.desc;
+        this.steps = params.steps;
+    }
+
+    get statsToAdd() {
+        return ["desc"]
+    }
+
+    getAction(against) {
+        let actions = [];
+        for (let repli of this.steps[this.step].replis) {
+            actions.push({
+                name: "say : " + repli.text,
+                id: "say:" + this.step + ":" + repli.code,
+                pos: this.entity.pos,
+                execute: (stage, content, player) => {
+                    stage.logGameAction.push(String("you say : " + repli.text));
+                    this.step = repli.next;
+                    stage.logGameAction.push(String(this.entity.name + " say : " + this.steps[this.step].text));
+                }
+            })
+        }
+        return actions;
     }
 
 }

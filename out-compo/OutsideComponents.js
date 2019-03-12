@@ -29,17 +29,18 @@ class BaseOutsideComponent {
 
     updatePos(newPos) {
         this.pos = newPos;
+
         this.draw();
     }
 
     updateSize(newSize) {
+
         this.size = newSize;
         this.draw();
     }
 
     draw() {
         //process.stdout.write(`\u001b[${this.pos.x};${this.pos.y}H`);
-
         process.stdout.write(this.colors);
         let tmp = this.getThingTodraw(this.lastData);
 
@@ -258,7 +259,7 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
             );
         });
 
-        base.push(this.decorateLine(("  " + cursorText).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
+        base.push(this.decorateLine((` [${this.cursorPos.x + playerRelX},${this.cursorPos.y + playerRelY}] ` + cursorText).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
             this.affChars["bordureVisualVerti"]));
         while (base.length < this.size.rows - 1) {
             base.push(this.decorateLine(" ".repeat(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
@@ -274,7 +275,6 @@ module.exports.Logs = class Logs extends BaseOutsideComponent {
     constructor(
         pos,
         size,
-
         decoration = "*",
         fColor = "white",
         bColor = "black"
@@ -402,7 +402,6 @@ module.exports.Actions = class Actions extends BaseOutsideComponent {
             execute: () => {
                 this.selectedCat = cat;
                 this.selectedCatName = catName;
-                this.selectedCatName = "move";
                 this.draw();
             }
         }
@@ -417,11 +416,14 @@ module.exports.Actions = class Actions extends BaseOutsideComponent {
      * @param {String[]} infos - array of string to draw
      */
     getThingTodraw(actions) {
+
         let formattedActions = [("  Actions : " + this.selectedCatName).padEnd(this.size.columns), this.centerLine("=".repeat(this.size.columns * 0.6))];
         this.actionKeys = [];
         let idCatAdded = [];
-        let keys = this.vrac;
+        let keys = JSON.parse(JSON.stringify(this.vrac));
+        //key calc
         for (let action of actions) {
+            delete action.key;
             let catName = action.id.split(':')[0];
             if (this.selectedCat === catName) {
                 let cat = this.categories[catName];
@@ -438,18 +440,21 @@ module.exports.Actions = class Actions extends BaseOutsideComponent {
                 formattedActions.push(`  - ${action.key} : ${action.name}[${action.pos.x};${action.pos.y}]`.padEnd(this.size.columns));
             } else {
                 if (!idCatAdded.includes(catName)) {
-                    let actionCat = this.bindFactory(catName, keys.pop(), action.name.split(' ').slice(0, action.name.split(' ').length - 1));
+                    let actionCat = this.bindFactory(catName, keys.pop(), action.name.split(' ')[0]);
                     this.actionKeys.push(actionCat);
                     idCatAdded.push(catName)
                 }
             }
         }
+        //key draw
         formattedActions.push(this.centerLine("=".repeat(this.size.columns * 0.6)));
         for (let action of this.actionKeys) {
             if (action.forComponent) {
                 formattedActions.push(`  - ${action.key} : ${action.name}`.padEnd(this.size.columns));
             }
         }
+
+        //decoration ajout lignes + encadrement
         while (formattedActions.length < this.size.rows - 2) {
             formattedActions.push(" ".repeat(this.size.columns));
         }

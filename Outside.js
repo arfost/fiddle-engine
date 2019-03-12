@@ -146,6 +146,7 @@ module.exports = class Outside {
         this.interface.logs.newDatas(gameInfos.stageInfos.gameLog);
         this.interface.actions.newDatas(gameInfos.stageInfos.actions);
 
+
         let keysDemands = [];
         keysDemands = keysDemands.concat(this.interface.logs.hasKeyToBind())
         keysDemands = keysDemands.concat(this.interface.actions.hasKeyToBind())
