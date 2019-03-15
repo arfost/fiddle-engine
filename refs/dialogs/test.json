@@ -26,10 +26,17 @@
         },
         "bad": {
             "text": "he bien aller au diable",
-            "replis": []
+            "replis": [],
+            "events": [{
+                "text": "vous jetes une pomme pourrie au visage, ça fait mal",
+                "name": "damage",
+                "params": {
+                    "damage": 2
+                }
+            }]
         },
         "quest": {
-            "text": "Merci, alors je vous explique. Il ya un gobelin plus loin, j'aimerais bien que vous le tuiez. Seulement ce sera pas possible avant la prochaine version donc revenez me voir plus tard.",
+            "text": "Merci, alors je vous explique. Il ya un gobelin plus loin au nord, j'aimerais bien que vous le tuiez. Seulement ce sera pas possible avant la prochaine version donc revenez me voir plus tard.",
             "replis": []
         }
     },

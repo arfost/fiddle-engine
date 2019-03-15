@@ -9,6 +9,8 @@ function getEntityType(type) {
             return Player;
         case "thing":
             return Thing;
+        case "gobelin":
+            return Gobelin;
         default:
             throw new Error("unknow entity type : " + type);
     }
@@ -29,13 +31,13 @@ class Entity {
     }
 
     getStat(statName) {
-        return this._stats[statName]
+        return this._stats[statName];
     }
 
     addStat(stat) {
         Object.defineProperty(this._stats, stat, {
             get: function () {
-                return this.emit('get_' + stat, 0);
+                return this.emit("get_" + stat, 0);
             }.bind(this),
             configurable: true,
             enumerable: true
@@ -43,18 +45,27 @@ class Entity {
     }
 
     subscribeTo(name, handler) {
+        console.log("(((((")
+        console.log(name)
+        console.log("))))))))")
         if (!this._events[name]) {
             this._events[name] = [];
         }
-        this._events[name].push(handler)
+        this._events[name].push(handler);
     }
 
     emit(name, event) {
-        let result;
-        for (let handler of this._events[name]) {
-            event = handler(event, result, this)
+        console.log("///")
+        console.log(name)
+        console.log(event)
+        console.log(this._events[name])
+        console.log(":::::")
+        if (this._events[name]) {
+            for (let handler of this._events[name]) {
+                event = handler(event, this);
+            }
         }
-        return event;
+        return event
     }
 
     isVisible() {
@@ -67,7 +78,7 @@ class Entity {
 
     addComponent(component) {
         if (this.components.has(component)) {
-            throw new Error("this entity already have this component")
+            throw new Error("this entity already have this component");
         } else {
             this.components.add(component);
             component.addEntity(this);
@@ -76,7 +87,7 @@ class Entity {
 
     removeComponent(component) {
         if (!this.components.has(component)) {
-            throw new Error("this entity doesn't have this component")
+            throw new Error("this entity doesn't have this component");
         } else {
             this.components.delete(component);
         }
@@ -107,29 +118,39 @@ class Entity {
 }
 
 class Thing extends Entity {
-
     constructor(entity) {
         super(entity);
-        this.addComponent(new BaseApparence({
-            desc: "Un vieu tout pourri"
-        }));
-        this.name = 'un vieu'
-        this.addComponent(new Dialog(require('./../refs/dialogs/test.json')));
+        this.addComponent(
+            new BaseApparence({
+                desc: "Un vieu tout pourri"
+            })
+        );
+        this.name = "un vieu";
+        this.addComponent(new Dialog(require("./../refs/dialogs/test.json")));
     }
 }
 
 class Player extends Entity {
-
     constructor(entity) {
         super(entity);
-        this.addComponent(new BaseApparence({
-            desc: "un joueur sexy et musclé"
-        }))
-        this.addComponent(new BaseStats())
+        this.addComponent(
+            new BaseApparence({
+                desc: "un joueur sexy et musclé"
+            })
+        );
+        this.addComponent(new BaseStats());
     }
+}
 
-    interact(player) {
-        return "you play with youself";
+class Gobelin extends Entity {
+    constructor(entity) {
+        super(entity);
+        this.addComponent(
+            new BaseApparence({
+                desc: "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur "
+            })
+        );
+        this.addComponent(new BaseStats());
     }
 }
 
@@ -138,46 +159,47 @@ class Component {
         return [];
     }
 
-    constructor() {
-
-    }
+    constructor() {}
     get eventsToSubscribe() {
-        return []
+        return [];
     }
     get statsToAdd() {
-        return []
+        return [];
     }
-
 
     addEntity(entity) {
         this.entity = entity;
         for (let eventToSubscribe of this.eventsToSubscribe) {
-            this.entity.subscribeTo(eventToSubscribe.name, eventToSubscribe.handler);
+            this.entity.subscribeTo(
+                eventToSubscribe.name,
+                eventToSubscribe.handler
+            );
         }
 
         for (let statToAdd of this.statsToAdd) {
             this.entity.addStat(statToAdd);
-            this.entity.subscribeTo('get_' + statToAdd, function (event) {
-                return event += this[statToAdd]
-            }.bind(this));
+            this.entity.subscribeTo(
+                "get_" + statToAdd,
+                function (event) {
+                    return (event += this[statToAdd]);
+                }.bind(this)
+            );
         }
     }
 }
 
 class BaseApparence extends Component {
-
     constructor(params) {
         super();
-        this.desc = params.desc
+        this.desc = params.desc;
     }
 
     get statsToAdd() {
-        return ["desc"]
+        return ["desc"];
     }
 }
 
 class Dialog extends Component {
-
     constructor(params) {
         super();
         this.step = "base";
@@ -186,7 +208,7 @@ class Dialog extends Component {
     }
 
     get statsToAdd() {
-        return ["desc"]
+        return ["desc"];
     }
 
     getAction(against) {
@@ -199,35 +221,84 @@ class Dialog extends Component {
                 execute: (stage, content, player) => {
                     stage.logGameAction.push(String("you say : " + repli.text));
                     this.step = repli.next;
-                    stage.logGameAction.push(String(this.entity.name + " say : " + this.steps[this.step].text));
+                    stage.logGameAction.push(
+                        String(
+                            this.entity.name +
+                            " say : " +
+                            this.steps[this.step].text
+                        )
+                    );
+                    if (this.steps[this.step].events) {
+
+                        for (let event of this.steps[this.step].events) {
+                            player.emit(event.name, event.params);
+                            if (event.text) {
+                                stage.logGameAction.push(String(this.entity.name + " : " + event.text));
+                            }
+                        }
+                    }
                 }
-            })
+            });
         }
         return actions;
     }
-
 }
 
 class BaseStats extends Component {
-
     constructor(params) {
         super();
         this.physique = 5;
         this.mental = 5;
-        this.santée = 8;
+        this.health = 5;
     }
 
     get statsToAdd() {
-        return ["physique", "mental"]
+        return ["physique", "mental", "desc", "perception"];
+    }
+
+    get desc() {
+        switch (this.health) {
+            case 5:
+                return " indemne";
+            case 4:
+                return " éraflé";
+            case 3:
+                return " legerement blessé";
+            case 2:
+                return " blessé";
+            case 1:
+                return " a l'agonie";
+            default:
+                return " mort d'etre décédé";
+        }
+    }
+
+    get perception() {
+        return this.mental * 2;
     }
 
     get eventsToSubscribe() {
         return [{
-            name: 'get_perception',
-            handler: (event => {
-                return this.mental * 2;
-            })
-        }]
+            name: "damage",
+            handler: event => {
+                this.health = this.health - event.damage;
+                event.damage = 0;
+                return event;
+            }
+        }];
+    }
+}
+
+class Combat extends Component {
+    constructor(params) {
+        super();
+        this.step = "base";
+        this.desc = params.desc;
+        this.steps = params.steps;
+    }
+
+    get statsToAdd() {
+        return ["desc"];
     }
 
     getAction(against) {
@@ -240,11 +311,16 @@ class BaseStats extends Component {
                 execute: (stage, content, player) => {
                     stage.logGameAction.push(String("you say : " + repli.text));
                     this.step = repli.next;
-                    stage.logGameAction.push(String(this.entity.name + " say : " + this.steps[this.step].text));
+                    stage.logGameAction.push(
+                        String(
+                            this.entity.name +
+                            " say : " +
+                            this.steps[this.step].text
+                        )
+                    );
                 }
-            })
+            });
         }
         return actions;
     }
-
 }

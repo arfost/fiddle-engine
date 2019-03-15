@@ -77,6 +77,19 @@ class BaseOutsideComponent {
         );
     }
 
+    chunkSubstr(str, size) {
+        var chunks = new Array(Math.ceil(str.length / size)),
+            nChunks = chunks.length;
+
+        var newo = 0;
+        for (var i = 0, o = 0; i < nChunks; ++i, o = newo) {
+            newo += size;
+            chunks[i] = str.substr(o, size);
+        }
+
+        return chunks;
+    }
+
     centerHLine(lines, rows = this.size.rows) {
         let newArray = [].concat(lines);
         let emptyRows = rows - newArray.length;
@@ -259,8 +272,13 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
             );
         });
 
-        base.push(this.decorateLine((` [${this.cursorPos.x + playerRelX},${this.cursorPos.y + playerRelY}] ` + cursorText).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
+        cursorText = ` [${this.cursorPos.x + playerRelX},${this.cursorPos.y + playerRelY}] ` + cursorText;
+        let cursorArray = this.chunkSubstr(cursorText, this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1);
+        cursorArray = cursorArray.map(l => this.decorateLine((l).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
             this.affChars["bordureVisualVerti"]));
+
+
+        base = [...base, ...cursorArray];
         while (base.length < this.size.rows - 1) {
             base.push(this.decorateLine(" ".repeat(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
                 this.affChars["bordureVisualVerti"]));

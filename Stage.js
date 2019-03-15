@@ -25,6 +25,14 @@ module.exports = class Stage {
             type: "player",
             img: new Image(["@"], "yellow")
         }));
+        this.addEntity(createEntityFromDesc({
+            pos: {
+                x: 5,
+                y: -5
+            },
+            type: "gobelin",
+            img: new Image(["$"], "red")
+        }));
 
         this.actions = this.calculateAction(this.player);
     }
