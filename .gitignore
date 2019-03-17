@@ -65,3 +65,6 @@ index-macos
 fiddle-launcher-linux
 fiddle-launcher-macos
 fiddle-launcher-win.exe
+build-entry-win.exe
+build-entry-linux
+build-entry-macos
