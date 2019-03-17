@@ -37,7 +37,7 @@ class Entity {
     addStat(stat) {
         Object.defineProperty(this._stats, stat, {
             get: function () {
-                return this.emit("get_" + stat, 0);
+                return this.emit("get_" + stat, "");
             }.bind(this),
             configurable: true,
             enumerable: true
@@ -45,9 +45,6 @@ class Entity {
     }
 
     subscribeTo(name, handler) {
-        console.log("(((((")
-        console.log(name)
-        console.log("))))))))")
         if (!this._events[name]) {
             this._events[name] = [];
         }
@@ -55,11 +52,6 @@ class Entity {
     }
 
     emit(name, event) {
-        console.log("///")
-        console.log(name)
-        console.log(event)
-        console.log(this._events[name])
-        console.log(":::::")
         if (this._events[name]) {
             for (let handler of this._events[name]) {
                 event = handler(event, this);
@@ -94,17 +86,11 @@ class Entity {
     }
 
     getPossibleActionsFor(entity) {
-        //console.log("//////////" + this.constructor.name);
         let actions = [];
         for (let component of this.components.values()) {
-            //console.log("--- " + component.constructor.name);
             let tmpAct = component.getAction(entity);
-            //console.log(tmpAct);
             actions = actions.concat(tmpAct);
-            //console.log(actions)
         }
-        //console.log("fin")
-        //console.log(actions)
         return actions;
     }
 
@@ -122,10 +108,10 @@ class Thing extends Entity {
         super(entity);
         this.addComponent(
             new BaseApparence({
-                desc: "Un vieu tout pourri"
+                desc: "Un vieu tout pourri",
+                name: "un vieu"
             })
         );
-        this.name = "un vieu";
         this.addComponent(new Dialog(require("./../refs/dialogs/test.json")));
     }
 }
@@ -135,10 +121,12 @@ class Player extends Entity {
         super(entity);
         this.addComponent(
             new BaseApparence({
-                desc: "un joueur sexy et musclé"
+                desc: "un joueur sexy et musclé",
+                name: "vous"
             })
         );
         this.addComponent(new BaseStats());
+        this.addComponent(new Combat());
     }
 }
 
@@ -147,10 +135,12 @@ class Gobelin extends Entity {
         super(entity);
         this.addComponent(
             new BaseApparence({
-                desc: "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur "
+                desc: "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur ",
+                name: "mochelin"
             })
         );
         this.addComponent(new BaseStats());
+        this.addComponent(new Combat());
     }
 }
 
@@ -192,10 +182,11 @@ class BaseApparence extends Component {
     constructor(params) {
         super();
         this.desc = params.desc;
+        this.name = params.name;
     }
 
     get statsToAdd() {
-        return ["desc"];
+        return ["desc", "name"];
     }
 }
 
@@ -259,17 +250,17 @@ class BaseStats extends Component {
     get desc() {
         switch (this.health) {
             case 5:
-                return " indemne";
+                return ", indemne";
             case 4:
-                return " éraflé";
+                return ", éraflé";
             case 3:
-                return " legerement blessé";
+                return ", legerement blessé";
             case 2:
-                return " blessé";
+                return ", blessé";
             case 1:
-                return " a l'agonie";
+                return ", a l'agonie";
             default:
-                return " mort d'etre décédé";
+                return ", mort d'etre décédé";
         }
     }
 
@@ -292,32 +283,41 @@ class BaseStats extends Component {
 class Combat extends Component {
     constructor(params) {
         super();
-        this.step = "base";
-        this.desc = params.desc;
-        this.steps = params.steps;
+        this.canBeAttacked = true;
+        this.canAttack = true;
     }
 
     get statsToAdd() {
-        return ["desc"];
+        return ["canBeAttacked", "canAttack"];
     }
 
     getAction(against) {
         let actions = [];
-        for (let repli of this.steps[this.step].replis) {
+        let isNear = Math.abs(this.entity.pos.x - against.pos.x) + Math.abs(this.entity.pos.y - against.pos.y) === 1;
+        console.log(this.entity.stats.name, against.stats.name, against.stats.canBeAttacked, this.entity.stats.canAttack, isNear, this.entity.pos, against.pos)
+        if (against.stats.canBeAttacked && this.canAttack && isNear) {
+            console.log("action pushed")
             actions.push({
-                name: "say : " + repli.text,
-                id: "say:" + this.step + ":" + repli.code,
-                pos: this.entity.pos,
+                name: "attack : " + this.entity.stats.name,
+                id: "atk:norm",
+                pos: against.pos,
                 execute: (stage, content, player) => {
-                    stage.logGameAction.push(String("you say : " + repli.text));
-                    this.step = repli.next;
-                    stage.logGameAction.push(
-                        String(
-                            this.entity.name +
-                            " say : " +
-                            this.steps[this.step].text
-                        )
-                    );
+                    stage.logGameAction.push(String(against.stats.name + " attack " + this.entity.stats.name));
+                    let attackScore = Number(against.stats.physique) + stage.getDice(1, 6);
+                    let defenseScore = Number(this.entity.stats.physique) + stage.getDice(1, 6);
+                    stage.logGameAction.push(String(attackScore + " attack against " + defenseScore + " defense"));
+                    let degat = attackScore - defenseScore;
+                    if (degat > 0) {
+                        stage.logGameAction.push(String(this.entity.stats.name + " is touched and take " + degat + " damage(s)"));
+                        this.entity.emit('damage', {
+                            damage: degat
+                        })
+                        if (this.entity.stats.health <= 0) {
+                            stage.logGameAction.push(String(this.entity.stats.name + " is dead"));
+                        }
+                    } else {
+                        stage.logGameAction.push(String(this.entity.stats.name + " totaly esquive the attack"));
+                    }
                 }
             });
         }

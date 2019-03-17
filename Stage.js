@@ -57,7 +57,7 @@ module.exports = class Stage {
 
     calculateAction(player) {
         let actions = [];
-        let perce = this.player.stats['perception'];
+        let perce = Number(this.player.stats['perception']);
 
         for (let i = this.player.pos.y - perce; i < this.player.pos.y + perce; i++) {
             for (let j = this.player.pos.x - perce; j < this.player.pos.x + perce; j++) {
@@ -206,7 +206,7 @@ module.exports = class Stage {
             actions: this.actions
         };
 
-        let perce = this.player.stats['perception'];
+        let perce = Number(this.player.stats['perception']);
 
         for (let i = this.player.pos.y - perce; i < this.player.pos.y + perce; i++) {
             for (let j = this.player.pos.x - perce; j < this.player.pos.x + perce; j++) {
@@ -235,5 +235,15 @@ module.exports = class Stage {
             }
         }
         return base;
+    }
+
+    getDice(min, max) {
+        if (typeof max === 'undefined') {
+            max = min;
+            min = 1;
+        }
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
     }
 };

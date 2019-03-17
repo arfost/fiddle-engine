@@ -272,9 +272,9 @@ module.exports.ScreenMap = class ScreenMap extends BaseOutsideComponent {
             );
         });
 
-        cursorText = ` [${this.cursorPos.x + playerRelX},${this.cursorPos.y + playerRelY}] ` + cursorText;
-        let cursorArray = this.chunkSubstr(cursorText, this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1);
-        cursorArray = cursorArray.map(l => this.decorateLine((l).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
+        cursorText = `[${this.cursorPos.x + playerRelX},${this.cursorPos.y + playerRelY}] ` + cursorText;
+        let cursorArray = this.chunkSubstr(cursorText, this.doubled ? this.size.columns * 2 - 4 : this.size.columns - 3);
+        cursorArray = cursorArray.map(l => this.decorateLine(("  " + l).padEnd(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars["bordureVisualVerti"] +
             this.affChars["bordureVisualVerti"]));
 
 
