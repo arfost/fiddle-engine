@@ -1,0 +1,28 @@
+{
+  "name": "fiddle-engine",
+  "version": "0.0.5",
+  "description": "a small rogue game engine, an experiment",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "pkg fiddle-launcher.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arfost/fiddle-engine.git"
+  },
+  "keywords": [
+    "roguelike",
+    "game",
+    "nodejs"
+  ],
+  "author": "arfost",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/arfost/fiddle-engine/issues"
+  },
+  "homepage": "https://github.com/arfost/fiddle-engine#readme",
+  "devDependencies": {
+    "pkg": "^4.3.7"
+  }
+}

@@ -62,3 +62,6 @@ typings/
 index-win.exe
 index-linux
 index-macos
+fiddle-launcher-linux
+fiddle-launcher-macos
+fiddle-launcher-win.exe
