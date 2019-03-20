@@ -108,8 +108,8 @@ class Thing extends Entity {
         super(entity);
         this.addComponent(
             new BaseApparence({
-                desc: "Un vieu tout pourri",
-                name: "un vieu"
+                desc: "Un vieux tout pourri",
+                name: "un vieux"
             })
         );
         this.addComponent(new Dialog(require("./../refs/dialogs/test.json")));
@@ -121,8 +121,8 @@ class Player extends Entity {
         super(entity);
         this.addComponent(
             new BaseApparence({
-                desc: "un joueur sexy et musclé",
-                name: "vous"
+                desc: "Peau mate, yeux verts, cheveux noirs, 1.90 mètres, une beauté au diapason de ses origines semi-démoniaques",
+                name: "Vous"
             })
         );
         this.addComponent(new BaseStats());
@@ -136,7 +136,7 @@ class Gobelin extends Entity {
         this.addComponent(
             new BaseApparence({
                 desc: "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur ",
-                name: "mochelin"
+                name: "Gornog"
             })
         );
         this.addComponent(new BaseStats());
