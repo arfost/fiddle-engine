@@ -1,6 +1,6 @@
 const Image = require('./helpers/Image.js');
 const createEntityFromDesc = require('./helpers/Entities.js');
-module.exports = class Stage {
+module.exports = class GameStage {
 
     constructor(params, player) {
         this.params = params;

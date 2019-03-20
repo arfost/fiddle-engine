@@ -1,22 +1,22 @@
-const Stage = require('./Stage.js');
+const GameStage = require('./GameStage.js');
 module.exports = class Game {
 
-    constructor(concret, gameDesc, gameOption) {
-        this.concret = concret;
+    constructor(Renderer) {
+        this.renderer = new Renderer(require("./renderer/consoleRenderer/ScreenDesc.json"), "game");
         this.TICK_RATE = 20;
         this.tick = 0;
         this.previous = this.hrtimeMs();
         this.tickLengthMs = 1000 / this.TICK_RATE;
-        this.currentStage = new Stage();
+        this.currentStage = new GameStage();
         this.gameInfos = "super titre"
     }
 
-    start(){
+    start() {
         this.run = true;
         this.loop()
     }
 
-    stop(){
+    stop() {
         this.run = false;
     }
 
@@ -28,13 +28,13 @@ module.exports = class Game {
         let now = this.hrtimeMs();
         let delta = (now - this.previous) / 1000;
 
-        this.currentStage.turn(this.concret.getLastInput());
+        this.currentStage.turn(this.renderer.getLastInput());
 
         let completScreen = {
-            stageInfos:this.currentStage.getStageInfos(),
-            gameInfos:this.gameInfos
+            stageInfos: this.currentStage.getStageInfos(),
+            gameInfos: this.gameInfos
         };
-        this.concret.drawScreen(completScreen);
+        this.renderer.drawScreen(completScreen);
         this.previous = now;
         this.tick++
     }

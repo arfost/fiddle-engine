@@ -1,17 +1,5 @@
 const Game = require('./Game.js');
-const Outside = require('./Outside.js');
+const Renderer = require('./renderer/consoleRenderer/ConsoleRenderer.js');
 
-let gameParams = {
-    screenSize: 80
-};
-let gameDesc = {
-    stages: {
-
-    },
-    player: {
-
-    }
-};
-let outside = new Outside();
-let game = new Game(outside, gameDesc, gameParams);
+let game = new Game(Renderer);
 game.start();

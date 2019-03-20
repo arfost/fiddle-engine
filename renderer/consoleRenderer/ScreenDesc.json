@@ -1,0 +1,57 @@
+{
+    "game": {
+        "components": [{
+            "type": "SimpleTitleC",
+            "datas": "litt:Super titre",
+            "size": {
+                "rows": "3",
+                "columns": "windowW"
+            },
+            "pos": {
+                "x": "0",
+                "y": "0"
+            }
+        },
+        {
+            "type": "GameMapC",
+            "datas": "stageInfos",
+            "size": {
+                "rows": "35",
+                "columns": "30"
+            },
+            "pos": {
+                "x": "3",
+                "y": "0"
+            }
+        },
+        {
+            "type": "LogsC",
+            "datas": "stageInfos.gameLog",
+            "size": {
+                "rows": "10",
+                "columns": "windowW"
+            },
+            "pos": {
+                "x": "38",
+                "y": "0"
+            }
+        },
+        {
+            "type": "ActionsC",
+            "datas": "stageInfos.actions",
+            "size": {
+                "rows": "35",
+                "columns": "windowW -60"
+            },
+            "pos": {
+                "x": "3",
+                "y": "60"
+            }
+        }],
+        "minSize":{
+            "rows": 44,
+            "columns": 70
+        }
+    },
+    "menu": []
+}
