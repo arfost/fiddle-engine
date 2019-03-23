@@ -27,12 +27,13 @@ module.exports = class Logs extends BaseConsoleRendererComponents {
                 forComponent: true,
                 key: 's',
                 execute: () => {
-                    if (this.index + this.size.rows - 2 < this.lastData.length) {
+                    if (this.index < this.lastData.length - 1) {
                         this.index++;
                         this.draw();
                     }
                 }
-            }
+            },
+            this.lastData[this.index]
         ]
     }
 
@@ -49,19 +50,20 @@ module.exports = class Logs extends BaseConsoleRendererComponents {
      * @param {String[]} infos - array of string to draw
      */
     getThingTodraw(actions) {
-        let columns = this.size.columns - 4;
         let rows = this.size.rows - 2;
         let lines = []
-        if (lines.length > rows) {
+        if (actions.length > rows) {
             lines.push("error to much options")
         } else {
             for (let i = 0; i < actions.length; i++) {
+                delete actions[i].key;
                 lines.push(i === this.index ? this.leftSymboleSelection + actions[i].name + this.rightSymboleSelection : actions[i].name)
             }
+            actions[this.index].key = "d";
         }
         lines = this.centerHLine(lines, rows);
         lines.unshift(this.newDecorationLine());
-        lines.push(this.newDecorationLine());
-        return lines.map(this.decorateLine.bind(this));
+        lines.push(" - z,s to navigate, d to validate -  ".padStart(this.size.columns, this.decoration));
+        return lines.map(this.centerLine.bind(this)).map(this.decorateLine.bind(this));
     }
 };

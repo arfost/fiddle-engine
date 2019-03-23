@@ -1,5 +1,5 @@
-const Image = require('./helpers/Image.js');
-const createEntityFromDesc = require('./helpers/Entities.js');
+const Image = require('../../helpers/Image.js');
+const createEntityFromDesc = require('../../helpers/Entities.js');
 module.exports = class GameStage {
 
     constructor(game) {
@@ -51,8 +51,10 @@ module.exports = class GameStage {
     turn(input) {
         if (input) {
             //big ad hoc test very very bad bad
-            if (input.id === "mn") {
-                input.execute(this.game, this)
+            if (input.id === "mn:pr") {
+                console.log("coucou")
+                input.execute(this.game, this);
+                return;
             }
 
             this.playerActeOn(input, this.player);
@@ -82,10 +84,12 @@ module.exports = class GameStage {
                     }, true);
 
                     if (possible) {
-                        let modifier = action.modifiers(pos, content, player);
-                        action.name += modifier.nameModifier;
-                        action.id += ":" + modifier.idModifier;
-                        action.pos = pos;
+                        if (action.modifiers) {
+                            let modifier = action.modifiers(pos, content, player);
+                            action.name += modifier.nameModifier;
+                            action.id += ":" + modifier.idModifier;
+                            action.pos = pos;
+                        }
                         actions.push(action)
                     }
                 }
@@ -185,11 +189,11 @@ module.exports = class GameStage {
                     stage.logGameAction.push('vous vous deplacez');
                 }
             }, {
-                name: "menu",
-                id: "mn",
+                name: "menu principal",
+                id: "mn:pr",
                 condition: [
-                    function () {
-                        return true;
+                    function (pos, content, player) {
+                        return content === player;
                     }
                 ],
                 execute: function (game, stage) {

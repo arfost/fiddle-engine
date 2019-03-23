@@ -49,7 +49,7 @@ module.exports = class MenuStage {
                 }
             ],
             execute: function (game) {
-                game.putBackStage("game");
+                game.saveCurrentStageAndChange("menu", "game", false);
             }
         }, {
             name: "quitter",

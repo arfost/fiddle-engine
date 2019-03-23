@@ -294,9 +294,7 @@ class Combat extends Component {
     getAction(against) {
         let actions = [];
         let isNear = Math.abs(this.entity.pos.x - against.pos.x) + Math.abs(this.entity.pos.y - against.pos.y) === 1;
-        console.log(this.entity.stats.name, against.stats.name, against.stats.canBeAttacked, this.entity.stats.canAttack, isNear, this.entity.pos, against.pos)
         if (against.stats.canBeAttacked && this.canAttack && isNear) {
-            console.log("action pushed")
             actions.push({
                 name: "attack : " + this.entity.stats.name,
                 id: "atk:norm",

@@ -7,13 +7,11 @@ module.exports = class Game {
         this.tick = 0;
         this.previous = this.hrtimeMs();
         this.tickLengthMs = 1000 / this.TICK_RATE;
-        this.currentStage = stageFactory("menu");
+
         this.gameInfos = "super titre";
         this.savedStages = {};
-    }
 
-    changeStage(stage) {
-        this.currentStage = stageFactory(stage);
+        this.saveCurrentStageAndChange("first", "menu");
     }
 
     start() {
@@ -55,9 +53,15 @@ module.exports = class Game {
     saveCurrentStageAndChange(stageName, newStage, shouldBeNew = true) {
         this.savedStages[stageName] = this.currentStage;
         if (shouldBeNew) {
-            this.currentStage = stageFactory(newStage);
+            this.currentStage = stageFactory(newStage, this);
+            this.renderer.changeCurrentScreen(newStage);
         } else {
-            this.putBackStage(newStage)
+            if (this.savedStages[newStage]) {
+                this.currentStage = this.savedStages[newStage];
+                this.renderer.changeCurrentScreen(newStage);
+            } else {
+                throw new Error("no such stage : " + newStage);
+            }
         }
     }
 
@@ -69,20 +73,6 @@ module.exports = class Game {
      */
     hasSavedStage(stageName) {
         return !!this.savedStages[stageName];
-    }
-
-    /**
-     * put a stage back in place in as the current stage
-     * 
-     * @param {String} stage - the stage name to put back as current stage
-     * @throws {Error} if the stage name is not in the saved stages list
-     */
-    putBackStage(stage) {
-        if (this.savedStages[stage]) {
-            this.currentStage = this.savedStages[stage];
-        } else {
-            throw new Error("no such stage : " + stage);
-        }
     }
 
     hrtimeMs() {

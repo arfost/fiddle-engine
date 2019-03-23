@@ -4,15 +4,14 @@ managedComponent.ActionsC = require('./components/ActionsC.js');
 managedComponent.GameMapC = require('./components/GameMapC.js');
 managedComponent.LogsC = require('./components/LogsC.js');
 managedComponent.SimpleTitleC = require('./components/SimpleTitleC.js');
+managedComponent.MenuC = require('./components/MenuC.js');
 
 const screensDefs = require('./ScreenDesc.json');
 
 module.exports = class Outside {
 
-    constructor(screensDefs, startScreen) {
+    constructor(screensDefs) {
         this.screensDefs = screensDefs;
-        this.currentScreen = this.screensDefs[startScreen];
-        //console.log(this.currentScreen);
         this.errorMode = 0;
         try {
             readline.emitKeypressEvents(process.stdin);
@@ -28,7 +27,10 @@ module.exports = class Outside {
 
         this.lastInput = false;
         process.stdin.on('keypress', this.keyPressed.bind(this));
+    }
 
+    changeCurrentScreen(screen) {
+        this.currentScreen = this.screensDefs[screen];
         this.isResized();
     }
 
@@ -37,7 +39,9 @@ module.exports = class Outside {
         if (details.ctrl) {
             str = "ctrl:" + str;
         }
-        //console.log(str)
+        if (str === "p") {
+            process.exit(0);
+        }
         let input = this.turnActionAssoc[str];
         if (input && input.forComponent) {
             input.execute();
@@ -64,6 +68,8 @@ module.exports = class Outside {
             for (let part of toConvert.split(" ")) {
                 if (part === "windowW") {
                     converted += this.size.columns;
+                } else if (part === "windowH") {
+                    converted += this.size.rows;
                 } else if (!isNaN(Number(part))) {
                     converted += Number(part);
                 } else {

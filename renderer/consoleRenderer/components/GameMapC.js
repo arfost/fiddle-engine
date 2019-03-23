@@ -97,8 +97,6 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
             }
         }
 
-        //console.log(base.length)
-        //console.log(base[0].length)
         //add cursor
         base[this.cursorPos.y][this.cursorPos.x] = doubled + "é"
 

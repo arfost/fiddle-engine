@@ -1,4 +1,4 @@
-const GameStage = require('./stages/GameStage.js/index.js');
+const GameStage = require('./stages/GameStage.js');
 const MenuStage = require('./stages/MenuStage.js');
 
 module.exports = function (stage, game) {
@@ -6,12 +6,12 @@ module.exports = function (stage, game) {
     return new stageClass(game);
 };
 
-function getEntityType(type) {
+function getStageType(type) {
     switch (type) {
         case "menu":
-            return GameStage;
-        case "game":
             return MenuStage;
+        case "game":
+            return GameStage;
         default:
             throw new Error("unknow stage type : " + type);
     }

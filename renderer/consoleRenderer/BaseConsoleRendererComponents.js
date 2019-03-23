@@ -18,7 +18,6 @@ module.exports = class BaseRendererComponent {
 
 
     newDatas(data) {
-        //console.log(data)
         let stringiData = JSON.stringify(data);
         if (stringiData !== this.lastDataStringified) {
             this.lastDataStringified = stringiData;
@@ -50,19 +49,13 @@ module.exports = class BaseRendererComponent {
 
 
         for (let [index, line] of tmp.entries()) {
-            //console.log("line is "+line.length+" long");
-            //console.log(this.positionToAnsi(this.pos.x + index, this.pos.y));
             process.stdout.write(
                 TerminalHelper.positionToAnsi(this.pos.x + index, this.pos.y)
             );
             try {
                 process.stdout.write(line);
-            } catch (e) {
-                //console.log("error " + e.message + " " + line);
-                //console.log(tmp);
-            }
+            } catch (e) {}
         }
-        //process.stdout.write(tmp.join('\n'));
         process.stdout.write("\x1b[0m\u001b[0;0H");
     }
 

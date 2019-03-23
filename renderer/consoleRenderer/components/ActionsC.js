@@ -50,7 +50,8 @@ module.exports = class Actions extends BaseConsoleRendererComponents {
             "t",
             "y",
             "f",
-            "g"
+            "g",
+            "h"
         ]
     }
 
@@ -71,10 +72,6 @@ module.exports = class Actions extends BaseConsoleRendererComponents {
         return this.actionKeys;
     }
 
-    get bannedActionId() {
-        return ["mn"]
-    }
-
     /**
      *
      * @param {String[]} infos - array of string to draw
@@ -87,10 +84,6 @@ module.exports = class Actions extends BaseConsoleRendererComponents {
         let keys = JSON.parse(JSON.stringify(this.vrac));
         //key calc
         for (let action of actions) {
-            //test for banned actions
-            if (this.bannedActionId.includes(action.id)) {
-                continue;
-            }
             delete action.key;
             let catName = action.id.split(':')[0];
             if (this.selectedCat === catName) {
@@ -105,7 +98,7 @@ module.exports = class Actions extends BaseConsoleRendererComponents {
                 }
 
                 this.actionKeys.push(action);
-                formattedActions.push(`  - ${action.key} : ${action.name}[${action.pos.x};${action.pos.y}]`.padEnd(this.size.columns));
+                formattedActions.push(`  - ${action.key} : ${action.name}${action.pos ? `[${action.pos.x};${action.pos.y}]`:""}`.padEnd(this.size.columns));
             } else {
                 if (!idCatAdded.includes(catName)) {
                     let actionCat = this.bindFactory(catName, keys.pop(), action.name.split(' ')[0]);
