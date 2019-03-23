@@ -2,8 +2,8 @@ const Image = require('./helpers/Image.js');
 const createEntityFromDesc = require('./helpers/Entities.js');
 module.exports = class GameStage {
 
-    constructor(params, player) {
-        this.params = params;
+    constructor(game) {
+        this.game = game;
         this.baseFloor = new Image(["."], "#666");
         this.baseDesc = "un endroit vide"
         this.posEntities = [];
@@ -50,6 +50,11 @@ module.exports = class GameStage {
 
     turn(input) {
         if (input) {
+            //big ad hoc test very very bad bad
+            if (input.id === "mn") {
+                input.execute(this.game, this)
+            }
+
             this.playerActeOn(input, this.player);
             this.actions = this.calculateAction(this.player);
         }
@@ -179,6 +184,17 @@ module.exports = class GameStage {
                     stage.hasMoved(oldPos);
                     stage.logGameAction.push('vous vous deplacez');
                 }
+            }, {
+                name: "menu",
+                id: "mn",
+                condition: [
+                    function () {
+                        return true;
+                    }
+                ],
+                execute: function (game, stage) {
+                    game.saveCurrentStageAndChange("game", "menu");
+                }
             }
         ]
     }
@@ -216,25 +232,6 @@ module.exports = class GameStage {
             }
         }
         return retour;
-    }
-
-    get screen() {
-        let base = new Array(this.screenSize).fill(0);
-        base = base.map(() => {
-            let row = new Array(this.screenSize).fill(0);
-            return row.map(() => this.baseFloor.img);
-        });
-        let playerRelX = this.player.pos.x - this.screenSize / 2;
-        let playerRelY = this.player.pos.y - this.screenSize / 2;
-
-        base[this.player.pos.y - (playerRelY)][this.player.pos.x - (playerRelX)] = this.player.img;
-        for (let entity of this.entities) {
-            if ((entity.pos.x > playerRelX && entity.pos.x < playerRelX + this.screenSize) &&
-                (entity.pos.y > playerRelY && entity.pos.y < playerRelY + this.screenSize)) {
-                base[entity.pos.y - playerRelY][entity.pos.x - playerRelX] = entity.img;
-            }
-        }
-        return base;
     }
 
     getDice(min, max) {

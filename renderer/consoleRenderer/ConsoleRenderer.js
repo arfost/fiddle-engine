@@ -34,9 +34,6 @@ module.exports = class Outside {
 
     keyPressed(str, details) {
 
-        if (str === "p") {
-            process.exit(0);
-        }
         if (details.ctrl) {
             str = "ctrl:" + str;
         }
@@ -50,27 +47,27 @@ module.exports = class Outside {
     }
 
     updateInterface() {
-        for(let component of this.currentScreen.components){
-            if(!component.instance){
+        for (let component of this.currentScreen.components) {
+            if (!component.instance) {
                 component.instance = new managedComponent[component.type](this.applySize(component.pos), this.applySize(component.size));
-            }else{
+            } else {
                 component.instance.updateConfig(this.applySize(component.pos), this.applySize(component.size));
             }
         }
     }
 
-    applySize(params){
+    applySize(params) {
         let convertedParams = {};
-        for(let param in params){
+        for (let param in params) {
             let toConvert = params[param];
             let converted = 0;
-            for(let part of toConvert.split(" ")){
-                if(part === "windowW"){
+            for (let part of toConvert.split(" ")) {
+                if (part === "windowW") {
                     converted += this.size.columns;
-                }else if(!isNaN(Number(part))){
+                } else if (!isNaN(Number(part))) {
                     converted += Number(part);
-                }else{
-                    throw new Error("Malformed value part for "+param+" : "+part);
+                } else {
+                    throw new Error("Malformed value part for " + param + " : " + part);
                 }
             }
             convertedParams[param] = converted;
@@ -111,12 +108,12 @@ module.exports = class Outside {
         process.stdout.write(this.errorCodeMessages[this.errorMode]);
     }
 
-    dataFromPath(path, gameinfos){
-        if(path.startsWith("litt:")){
+    dataFromPath(path, gameinfos) {
+        if (path.startsWith("litt:")) {
             return path.replace('litt:', '');
-        }else{
-            return path.split('.').reduce((acc, node)=>{
-                if(acc&&acc[node]){
+        } else {
+            return path.split('.').reduce((acc, node) => {
+                if (acc && acc[node]) {
                     return acc[node];
                 }
                 return undefined;
@@ -132,8 +129,8 @@ module.exports = class Outside {
         }
 
         let keysDemands = [];
-        for(let component of this.currentScreen.components){
-            if(!component.instance){
+        for (let component of this.currentScreen.components) {
+            if (!component.instance) {
                 throw new Error("component is not ready");
             }
             component.instance.newDatas(this.dataFromPath(component.datas, gameInfos));

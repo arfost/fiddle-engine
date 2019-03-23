@@ -117,11 +117,11 @@ module.exports = class BaseRendererComponent {
             .replace(/^./, decoration);
     }
 
-    newDecorationLine(deco = this.decoration, width = this.size.columns) {
+    newDecorationLine(width = this.size.columns, deco = this.decoration) {
         return deco.repeat(width);
     }
 
-    hasKeyToBind(){
+    hasKeyToBind() {
         return [];
     }
 }
