@@ -68,3 +68,5 @@ fiddle-launcher-win.exe
 build-entry-win.exe
 build-entry-linux
 build-entry-macos
+
+.scannerwork/

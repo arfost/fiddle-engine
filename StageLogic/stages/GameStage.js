@@ -52,7 +52,6 @@ module.exports = class GameStage {
         if (input) {
             //big ad hoc test very very bad bad
             if (input.id === "mn:pr") {
-                console.log("coucou")
                 input.execute(this.game, this);
                 return;
             }
