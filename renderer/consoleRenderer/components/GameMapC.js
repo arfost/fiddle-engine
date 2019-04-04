@@ -32,6 +32,7 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
                 execute: () => {
                     if (this.cursorPos.y > 0) {
                         this.cursorPos.y--;
+                        this.draw();
                     }
                 }
             },
@@ -41,6 +42,7 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
                 execute: () => {
                     if (this.cursorPos.y < this.size.rows - 8) {
                         this.cursorPos.y++;
+                        this.draw();
                     }
                 }
             },
@@ -50,6 +52,7 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
                 execute: () => {
                     if (this.cursorPos.x < this.size.columns - 3) {
                         this.cursorPos.x++;
+                        this.draw();
                     }
                 }
             },
@@ -59,6 +62,7 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
                 execute: () => {
                     if (this.cursorPos.x > 0) {
                         this.cursorPos.x--;
+                        this.draw();
                     }
                 }
             }
@@ -73,6 +77,7 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
         let doubled = this.doubled ? " " : "";
         let columns = this.size.columns - 2;
         let rows = this.size.rows - 7;
+        this.activeAssets = [];
 
         if (infos === null) {
             return new Array(this.size.rows).fill(0).map(() => {
@@ -82,23 +87,43 @@ module.exports = class ScreenMap extends BaseConsoleRendererComponents {
         }
         let cursorText = infos.baseDesc;
 
-        let base = new Array(rows).fill(0);
-        base = base.map(() => {
-            let row = new Array(columns).fill(0);
-            return row.map(() => doubled + infos.baseFloor.img);
-        });
         let playerRelX = Math.ceil(infos.basePos.x - columns / 2);
         let playerRelY = Math.ceil(infos.basePos.y - rows / 2);
 
+        let entByPos = {};
+        let assetByPos = {};
+
         for (let entity of infos.entities) {
-            base[entity.pos.y - playerRelY][entity.pos.x - playerRelX] = doubled + entity.img;
-            if (entity.pos.y - playerRelY === this.cursorPos.y && entity.pos.x - playerRelX === this.cursorPos.x) {
-                cursorText = entity.stats.desc;
+            entByPos[entity.pos.x + ":" + entity.pos.y] = entity;
+        }
+
+        let base = [];
+        for (let i = 0; i < rows; i++) {
+            base.push([]);
+            for (let j = 0; j < columns; j++) {
+                let asset;
+                if (entByPos[(j + playerRelX) + ":" + (i + playerRelY)]) {
+                    asset = this.createNewAsset(entByPos[(j + playerRelX) + ":" + (i + playerRelY)].img, entByPos[(j + playerRelX) + ":" + (i + playerRelY)].id, {
+                        x: i + 1,
+                        y: this.doubled ? (j + 1) * 2 + 1 : j + 1
+                    });
+                    if (i === this.cursorPos.y && j === this.cursorPos.x) {
+                        cursorText = entByPos[(j + playerRelX) + ":" + (i + playerRelY)].stats.desc;
+                    }
+                } else {
+                    asset = this.createNewAsset(infos.baseFloor, (j + playerRelY) + ":" + (i + playerRelX), {
+                        x: i + 1,
+                        y: this.doubled ? (j + 1) * 2 + 1 : j + 1
+                    });
+                }
+                assetByPos[i + ":" + j] = asset;
+                asset.toggleBlink(false);
+                base[i].push(doubled + asset.img);
             }
         }
 
-        //add cursor
-        base[this.cursorPos.y][this.cursorPos.x] = doubled + "é"
+        assetByPos[this.cursorPos.y + ":" + this.cursorPos.x].toggleBlink(true);
+
 
         base.unshift(
             new Array(base[0].length).fill(

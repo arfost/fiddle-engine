@@ -1,5 +1,5 @@
-const TerminalHelper = require('../../helpers/TerminalHelper.js');
-
+const TerminalHelper = require('./helpers/TerminalHelper.js');
+const assetProvider = require('./assetsLogic/AssetProvider.js')
 module.exports = class BaseRendererComponent {
     constructor(
         pos,
@@ -13,9 +13,9 @@ module.exports = class BaseRendererComponent {
         this.decoration = decoration;
         this.colors = TerminalHelper.colorToAnsi(fColor, bColor);
         this.lastData = "";
+        this.activeAssets = [];
+        this.assetList = {};
     }
-
-
 
     newDatas(data) {
         let stringiData = JSON.stringify(data);
@@ -23,6 +23,11 @@ module.exports = class BaseRendererComponent {
             this.lastDataStringified = stringiData;
             this.lastData = data;
             this.draw();
+        } else {
+            for (let asset of this.activeAssets) {
+                asset.tick();
+            }
+            process.stdout.write("\x1b[0m\u001b[0;0H");
         }
     }
 
@@ -57,6 +62,16 @@ module.exports = class BaseRendererComponent {
             } catch (e) {}
         }
         process.stdout.write("\x1b[0m\u001b[0;0H");
+    }
+
+    createNewAsset(assetId, internalId, internalPos) {
+        if (!this.assetList[internalId]) {
+            this.assetList[internalId] = assetProvider.getNewImg(assetId);
+        }
+        this.assetList[internalId].pos = internalPos;
+        this.assetList[internalId].basePos = this.pos;
+        this.activeAssets.push(this.assetList[internalId]);
+        return this.assetList[internalId];
     }
 
     getThingTodraw() {

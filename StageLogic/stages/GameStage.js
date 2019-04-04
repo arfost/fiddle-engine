@@ -1,37 +1,38 @@
-const Image = require('../../helpers/Image.js');
-const createEntityFromDesc = require('../../helpers/Entities.js');
+const Image = require('../../renderer/consoleRenderer/assetsLogic/assets/Image.js');
+const createEntityFromDesc = require('./elements/Entities.js');
 module.exports = class GameStage {
 
     constructor(game) {
         this.game = game;
-        this.baseFloor = new Image(["."], "#666");
+        this.baseFloor = "base";
         this.baseDesc = "un endroit vide"
         this.posEntities = [];
         this.entities = [];
         this.logGameAction = ["Vous entrez dans le stage de test"];
+
         this.addEntity(createEntityFromDesc({
             pos: {
-                x: 4,
-                y: 2
-            },
-            type: "thing",
-            img: new Image(["o", "O"], "green")
-        }));
-        this.addEntity(createEntityFromDesc({
-            pos: {
-                x: 5,
-                y: 5
+                x: 7,
+                y: 3
             },
             type: "player",
-            img: new Image(["@"], "yellow")
+            img: "player"
         }));
         this.addEntity(createEntityFromDesc({
             pos: {
                 x: 5,
-                y: -5
+                y: 3
+            },
+            type: "thing",
+            img: "vieu"
+        }));
+        this.addEntity(createEntityFromDesc({
+            pos: {
+                x: 3,
+                y: 0
             },
             type: "gobelin",
-            img: new Image(["$"], "red")
+            img: "gob"
         }));
 
         this.actions = this.calculateAction(this.player);

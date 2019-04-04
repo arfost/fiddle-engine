@@ -21,6 +21,7 @@ class Entity {
         this.pos = entity.pos;
         this._img = entity.img;
         this.type = entity.type;
+        this.id = this.type;
         this.components = new Set();
         this._stats = {};
         this._events = {};
@@ -65,7 +66,7 @@ class Entity {
     }
 
     get img() {
-        return this._img.img;
+        return this._img;
     }
 
     addComponent(component) {
@@ -112,7 +113,7 @@ class Thing extends Entity {
                 name: "un vieux"
             })
         );
-        this.addComponent(new Dialog(require("./../refs/dialogs/test.json")));
+        this.addComponent(new Dialog(require("../../../refs/dialogs/test.json")));
     }
 }
 
