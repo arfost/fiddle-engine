@@ -1,39 +1,44 @@
-const Image = require('../../renderer/consoleRenderer/assetsLogic/assets/Image.js');
-const createEntityFromDesc = require('./elements/Entities.js');
+const Image = require("../../renderer/consoleRenderer/assetsLogic/assets/Image.js");
+const createEntityFromDesc = require("./elements/Entities.js");
 module.exports = class GameStage {
-
     constructor(game) {
         this.game = game;
         this.baseFloor = "base";
-        this.baseDesc = "un endroit vide"
+        this.baseDesc = "un endroit vide";
         this.posEntities = [];
         this.entities = [];
         this.logGameAction = ["Vous entrez dans le stage de test"];
 
-        this.addEntity(createEntityFromDesc({
-            pos: {
-                x: 7,
-                y: 3
-            },
-            type: "player",
-            img: "player"
-        }));
-        this.addEntity(createEntityFromDesc({
-            pos: {
-                x: 5,
-                y: 3
-            },
-            type: "thing",
-            img: "vieu"
-        }));
-        this.addEntity(createEntityFromDesc({
-            pos: {
-                x: 3,
-                y: 0
-            },
-            type: "gobelin",
-            img: "gob"
-        }));
+        this.addEntity(
+            createEntityFromDesc({
+                pos: {
+                    x: 7,
+                    y: 3
+                },
+                type: "player",
+                img: "player"
+            })
+        );
+        this.addEntity(
+            createEntityFromDesc({
+                pos: {
+                    x: 5,
+                    y: 3
+                },
+                type: "thing",
+                img: "vieu"
+            })
+        );
+        this.addEntity(
+            createEntityFromDesc({
+                pos: {
+                    x: 3,
+                    y: 0
+                },
+                type: "gobelin",
+                img: "gob"
+            })
+        );
 
         this.actions = this.calculateAction(this.player);
     }
@@ -44,7 +49,7 @@ module.exports = class GameStage {
         }
         this.entities.push(entity);
         if (!this.posEntities[entity.pos.y]) {
-            this.posEntities[entity.pos.y] = []
+            this.posEntities[entity.pos.y] = [];
         }
         this.posEntities[entity.pos.y][entity.pos.x] = entity;
     }
@@ -56,23 +61,37 @@ module.exports = class GameStage {
                 input.execute(this.game, this);
                 return;
             }
-
-            this.playerActeOn(input, this.player);
+            input.execute(
+                this,
+                this.posEntities[input.pos.y] ?
+                this.posEntities[input.pos.y][input.pos.x] :
+                undefined,
+                this.player
+            );
+            for (let entity of this.entities) {
+                //do perception here
+                entity.emit("turn", {
+                    entList: this.entities,
+                    actionExecutor: (action) => {
+                        action.execute(this)
+                    }
+                })
+            }
             this.actions = this.calculateAction(this.player);
         }
     }
 
     calculateAction(player) {
         let actions = [];
-        let perce = Number(this.player.stats['perception']);
+        let perce = Number(this.player.stats["perception"]);
 
         for (let i = this.player.pos.y - perce; i < this.player.pos.y + perce; i++) {
             for (let j = this.player.pos.x - perce; j < this.player.pos.x + perce; j++) {
-                let content = this.posEntities[i] ? this.posEntities[i][j] : undefined;
+                let content = this.posEntities[i] ?
+                    this.posEntities[i][j] :
+                    undefined;
                 if (content) {
-                    let entAction = content.getPossibleActionsFor(player);
-
-                    actions = actions.concat(entAction)
+                    actions = actions.concat(content.getPossibleActionsFor(player));
                 }
                 let pos = {
                     x: j,
@@ -85,12 +104,16 @@ module.exports = class GameStage {
 
                     if (possible) {
                         if (action.modifiers) {
-                            let modifier = action.modifiers(pos, content, player);
+                            let modifier = action.modifiers(
+                                pos,
+                                content,
+                                player
+                            );
                             action.name += modifier.nameModifier;
                             action.id += ":" + modifier.idModifier;
                             action.pos = pos;
                         }
-                        actions.push(action)
+                        actions.push(action);
                     }
                 }
             }
@@ -107,11 +130,16 @@ module.exports = class GameStage {
                         return content === undefined;
                     },
                     function (pos, content, player) {
-                        return Math.abs(pos.x - player.pos.x) + Math.abs(pos.y - player.pos.y) === 1
+                        return (
+                            Math.abs(pos.x - player.pos.x) +
+                            Math.abs(pos.y - player.pos.y) ===
+                            1
+                        );
                     }
                 ],
                 modifiers: function (pos, content, player) {
-                    let result = (pos.x - player.pos.x) + ";" + (pos.y - player.pos.y);
+                    let result =
+                        pos.x - player.pos.x + ";" + (pos.y - player.pos.y);
                     switch (result) {
                         case "1;0":
                             return {
@@ -141,7 +169,7 @@ module.exports = class GameStage {
                     let oldPos = player.pos;
                     player.pos = this.pos;
                     stage.hasMoved(oldPos);
-                    stage.logGameAction.push('vous vous deplacez');
+                    stage.logGameAction.push("vous vous deplacez");
                 }
             },
             {
@@ -152,11 +180,18 @@ module.exports = class GameStage {
                         return content === undefined;
                     },
                     function (pos, content, player) {
-                        return Math.abs(pos.x - player.pos.x) + Math.abs(pos.y - player.pos.y) === 2 && Math.abs(pos.x - player.pos.x) !== Math.abs(pos.y - player.pos.y)
+                        return (
+                            Math.abs(pos.x - player.pos.x) +
+                            Math.abs(pos.y - player.pos.y) ===
+                            2 &&
+                            Math.abs(pos.x - player.pos.x) !==
+                            Math.abs(pos.y - player.pos.y)
+                        );
                     }
                 ],
                 modifiers: function (pos, content, player) {
-                    let result = (pos.x - player.pos.x) + ";" + (pos.y - player.pos.y);
+                    let result =
+                        pos.x - player.pos.x + ";" + (pos.y - player.pos.y);
                     switch (result) {
                         case "2;0":
                             return {
@@ -186,9 +221,10 @@ module.exports = class GameStage {
                     let oldPos = player.pos;
                     player.pos = this.pos;
                     stage.hasMoved(oldPos);
-                    stage.logGameAction.push('vous vous deplacez');
+                    stage.logGameAction.push("vous vous deplacez");
                 }
-            }, {
+            },
+            {
                 name: "menu principal",
                 id: "mn:pr",
                 condition: [
@@ -200,17 +236,13 @@ module.exports = class GameStage {
                     game.saveCurrentStageAndChange("game", "menu");
                 }
             }
-        ]
-    }
-
-    playerActeOn(action, player) {
-        action.execute(this, this.posEntities[action.pos.y] ? this.posEntities[action.pos.y][action.pos.x] : undefined, player);
+        ];
     }
 
     hasMoved(oldPos) {
         let entity = this.posEntities[oldPos.y][oldPos.x];
         if (!this.posEntities[entity.pos.y]) {
-            this.posEntities[entity.pos.y] = []
+            this.posEntities[entity.pos.y] = [];
         }
         this.posEntities[entity.pos.y][entity.pos.x] = entity;
         this.posEntities[oldPos.y][oldPos.x] = undefined;
@@ -226,11 +258,19 @@ module.exports = class GameStage {
             actions: this.actions
         };
 
-        let perce = Number(this.player.stats['perception']);
+        let perce = Number(this.player.stats["perception"]);
 
-        for (let i = this.player.pos.y - perce; i < this.player.pos.y + perce; i++) {
-            for (let j = this.player.pos.x - perce; j < this.player.pos.x + perce; j++) {
-                if (this.posEntities[i] && this.posEntities[i][j] && this.posEntities[i][j].isVisible(this.player)) {
+        for (
+            let i = this.player.pos.y - perce; i < this.player.pos.y + perce; i++
+        ) {
+            for (
+                let j = this.player.pos.x - perce; j < this.player.pos.x + perce; j++
+            ) {
+                if (
+                    this.posEntities[i] &&
+                    this.posEntities[i][j] &&
+                    this.posEntities[i][j].isVisible(this.player)
+                ) {
                     retour.entities.push(this.posEntities[i][j]);
                 }
             }
@@ -239,12 +279,12 @@ module.exports = class GameStage {
     }
 
     getDice(min, max) {
-        if (typeof max === 'undefined') {
+        if (typeof max === "undefined") {
             max = min;
             min = 1;
         }
         min = Math.ceil(min);
         max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+        return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
     }
 };

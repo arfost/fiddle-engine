@@ -58,7 +58,7 @@ class Entity {
                 event = handler(event, this);
             }
         }
-        return event
+        return event;
     }
 
     isVisible() {
@@ -89,18 +89,13 @@ class Entity {
     getPossibleActionsFor(entity) {
         let actions = [];
         for (let component of this.components.values()) {
-            let tmpAct = component.getAction(entity);
-            actions = actions.concat(tmpAct);
+            actions = actions.concat(component.getAction(entity));
         }
         return actions;
     }
 
     get infos() {
         return this.type;
-    }
-
-    interact(player) {
-        throw new Error("interact must be overrided");
     }
 }
 
@@ -113,7 +108,9 @@ class Thing extends Entity {
                 name: "un vieux"
             })
         );
-        this.addComponent(new Dialog(require("../../../refs/dialogs/test.json")));
+        this.addComponent(
+            new Dialog(require("../../../refs/dialogs/test.json"))
+        );
     }
 }
 
@@ -142,6 +139,7 @@ class Gobelin extends Entity {
         );
         this.addComponent(new BaseStats());
         this.addComponent(new Combat());
+        this.addComponent(new IntelligenceArtificielle());
     }
 }
 
@@ -211,21 +209,24 @@ class Dialog extends Component {
                 id: "say:" + this.step + ":" + repli.code,
                 pos: this.entity.pos,
                 execute: (stage, content, player) => {
-                    stage.logGameAction.push(String("you say : " + repli.text));
+                    stage.logGameAction.push(String(against.stats.name + " say : " + repli.text));
                     this.step = repli.next;
                     stage.logGameAction.push(
                         String(
-                            this.entity.name +
+                            this.entity.stats.name +
                             " say : " +
                             this.steps[this.step].text
                         )
                     );
                     if (this.steps[this.step].events) {
-
                         for (let event of this.steps[this.step].events) {
-                            player.emit(event.name, event.params);
+                            against.emit(event.name, event.params);
                             if (event.text) {
-                                stage.logGameAction.push(String(this.entity.name + " : " + event.text));
+                                stage.logGameAction.push(
+                                    String(
+                                        this.entity.stats.name + " : " + event.text
+                                    )
+                                );
                             }
                         }
                     }
@@ -281,6 +282,35 @@ class BaseStats extends Component {
     }
 }
 
+class IntelligenceArtificielle extends Component {
+    constructor(params) {
+        super();
+        console.log("coucou")
+    }
+
+    get eventsToSubscribe() {
+        return [{
+            name: "turn",
+            handler: event => {
+                let allPossibleActions = []
+                for (let entity of event.entList) {
+                    allPossibleActions = allPossibleActions.concat(entity.getPossibleActionsFor(this.entity));
+                }
+                let selectedAction;
+                for (let action of allPossibleActions) {
+                    console.log("testing ia against : " + action.id)
+                    if (action.id === "atk:norm") {
+                        selectedAction = action;
+                    }
+                }
+                if (selectedAction) {
+                    event.actionExecutor(selectedAction);
+                }
+            }
+        }];
+    }
+}
+
 class Combat extends Component {
     constructor(params) {
         super();
@@ -294,28 +324,61 @@ class Combat extends Component {
 
     getAction(against) {
         let actions = [];
-        let isNear = Math.abs(this.entity.pos.x - against.pos.x) + Math.abs(this.entity.pos.y - against.pos.y) === 1;
+        let isNear =
+            Math.abs(this.entity.pos.x - against.pos.x) +
+            Math.abs(this.entity.pos.y - against.pos.y) ===
+            1;
         if (against.stats.canBeAttacked && this.canAttack && isNear) {
             actions.push({
                 name: "attack : " + this.entity.stats.name,
                 id: "atk:norm",
                 pos: against.pos,
                 execute: (stage, content, player) => {
-                    stage.logGameAction.push(String(against.stats.name + " attack " + this.entity.stats.name));
-                    let attackScore = Number(against.stats.physique) + stage.getDice(1, 6);
-                    let defenseScore = Number(this.entity.stats.physique) + stage.getDice(1, 6);
-                    stage.logGameAction.push(String(attackScore + " attack against " + defenseScore + " defense"));
+                    stage.logGameAction.push(
+                        String(
+                            against.stats.name +
+                            " attack " +
+                            this.entity.stats.name
+                        )
+                    );
+                    let attackScore =
+                        Number(against.stats.physique) + stage.getDice(1, 6);
+                    let defenseScore =
+                        Number(this.entity.stats.physique) +
+                        stage.getDice(1, 6);
+                    stage.logGameAction.push(
+                        String(
+                            attackScore +
+                            " attack against " +
+                            defenseScore +
+                            " defense"
+                        )
+                    );
                     let degat = attackScore - defenseScore;
                     if (degat > 0) {
-                        stage.logGameAction.push(String(this.entity.stats.name + " is touched and take " + degat + " damage(s)"));
-                        this.entity.emit('damage', {
+                        stage.logGameAction.push(
+                            String(
+                                this.entity.stats.name +
+                                " is touched and take " +
+                                degat +
+                                " damage(s)"
+                            )
+                        );
+                        this.entity.emit("damage", {
                             damage: degat
-                        })
+                        });
                         if (this.entity.stats.health <= 0) {
-                            stage.logGameAction.push(String(this.entity.stats.name + " is dead"));
+                            stage.logGameAction.push(
+                                String(this.entity.stats.name + " is dead")
+                            );
                         }
                     } else {
-                        stage.logGameAction.push(String(this.entity.stats.name + " totaly esquive the attack"));
+                        stage.logGameAction.push(
+                            String(
+                                this.entity.stats.name +
+                                " totaly esquive the attack"
+                            )
+                        );
                     }
                 }
             });
