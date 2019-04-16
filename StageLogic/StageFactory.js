@@ -1,5 +1,5 @@
-const GameStage = require('./stages/GameStage.js');
-const MenuStage = require('./stages/MenuStage.js');
+const GameStage = require('./stages/2dCaseStage/2dCaseStage.js');
+const MenuStage = require('./stages/menu/MenuStage.js');
 
 module.exports = function (stage, game) {
     let stageClass = getStageType(stage);

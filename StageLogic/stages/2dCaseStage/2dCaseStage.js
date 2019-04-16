@@ -1,4 +1,3 @@
-const Image = require("../../renderer/consoleRenderer/assetsLogic/assets/Image.js");
 const createEntityFromDesc = require("./elements/Entities.js");
 module.exports = class GameStage {
     constructor(game) {
