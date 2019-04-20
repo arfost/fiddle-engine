@@ -24,7 +24,7 @@ module.exports = class GameStage {
                     x: 5,
                     y: 3
                 },
-                type: "thing",
+                type: "vieu",
                 img: "vieu"
             })
         );

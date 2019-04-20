@@ -1,6 +1,6 @@
 let BaseConsoleRendererComponents = require('../BaseConsoleRendererComponents.js');
 
-module.exports = class SimpleTitle extends BaseConsoleRendererComponents {
+module.exports = class SimpleTitleC extends BaseConsoleRendererComponents {
     /**
      *
      * @param {String} data - title to show

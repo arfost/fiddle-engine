@@ -1,4 +1,5 @@
-class BaseStats extends Component {
+const Component = require('../Component.js')
+module.exports = class BaseStats extends Component {
     constructor(params) {
         super();
         this.physique = 5;

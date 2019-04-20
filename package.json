@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/arfost/fiddle-engine#readme",
   "devDependencies": {
+    "eslint": "^5.16.0",
     "pkg": "^4.3.7"
   }
 }

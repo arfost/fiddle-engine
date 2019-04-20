@@ -1,7 +1,7 @@
 let BaseConsoleRendererComponents = require('../BaseConsoleRendererComponents.js');
 
 
-module.exports = class ScreenMap extends BaseConsoleRendererComponents {
+module.exports = class GameMapC extends BaseConsoleRendererComponents {
     constructor(
         pos,
         size,

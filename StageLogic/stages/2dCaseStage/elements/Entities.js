@@ -1,20 +1,19 @@
-module.exports = function (entity) {
-    let type = getEntityType(entity.type);
-    return new type(entity);
+const cFactory = require('./ComponentsFactory.js')
+const entitiesDefinition = require('./defs.json')
+
+module.exports = function (entityParams) {
+    let definition = entitiesDefinition[entityParams.type];
+    if(!definition){
+        throw new Error("unknow entity definition "+entityParams.type)
+    }
+    let entity = new Entity(entityParams);
+    for(let comp of definition){
+        entity.addComponent(cFactory(comp.type, comp.params))
+    }
+    return entity;
 };
 
-function getEntityType(type) {
-    switch (type) {
-        case "player":
-            return Player;
-        case "thing":
-            return Thing;
-        case "gobelin":
-            return Gobelin;
-        default:
-            throw new Error("unknow entity type : " + type);
-    }
-}
+
 
 class Entity {
     constructor(entity) {
@@ -96,49 +95,5 @@ class Entity {
 
     get infos() {
         return this.type;
-    }
-}
-
-class Thing extends Entity {
-    constructor(entity) {
-        super(entity);
-        this.addComponent(
-            new BaseApparence({
-                desc: "Un vieux tout pourri",
-                name: "un vieux"
-            })
-        );
-        this.addComponent(
-            new Dialog(require("../../../refs/dialogs/test.json"))
-        );
-    }
-}
-
-class Player extends Entity {
-    constructor(entity) {
-        super(entity);
-        this.addComponent(
-            new BaseApparence({
-                desc: "Peau mate, yeux verts, cheveux noirs, 1.90 mètres, une beauté au diapason de ses origines semi-démoniaques",
-                name: "Vous"
-            })
-        );
-        this.addComponent(new BaseStats());
-        this.addComponent(new Combat());
-    }
-}
-
-class Gobelin extends Entity {
-    constructor(entity) {
-        super(entity);
-        this.addComponent(
-            new BaseApparence({
-                desc: "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur ",
-                name: "Gornog"
-            })
-        );
-        this.addComponent(new BaseStats());
-        this.addComponent(new Combat());
-        this.addComponent(new IntelligenceArtificielle());
     }
 }

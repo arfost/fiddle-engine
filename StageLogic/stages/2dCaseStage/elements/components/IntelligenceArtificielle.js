@@ -1,4 +1,6 @@
-class IntelligenceArtificielle extends Component {
+const Component = require('../Component.js')
+
+module.exports = class IntelligenceArtificielle extends Component {
     constructor(params) {
         super();
     }

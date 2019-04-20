@@ -1,7 +1,7 @@
 let BaseConsoleRendererComponents = require('../BaseConsoleRendererComponents.js');
 
 
-module.exports = class Actions extends BaseConsoleRendererComponents {
+module.exports = class ActionsC extends BaseConsoleRendererComponents {
     constructor(
         pos,
         size,

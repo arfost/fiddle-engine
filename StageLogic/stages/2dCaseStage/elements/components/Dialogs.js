@@ -1,6 +1,9 @@
-class Dialog extends Component {
-    constructor(params) {
+const Component = require('../Component.js')
+
+module.exports = class Dialog extends Component {
+    constructor(ref) {
         super();
+        let params = require(ref)
         this.step = "base";
         this.desc = params.desc;
         this.steps = params.steps;

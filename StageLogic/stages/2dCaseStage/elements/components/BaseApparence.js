@@ -1,4 +1,6 @@
-class BaseApparence extends Component {
+const Component = require('../Component.js')
+
+module.exports = class BaseApparence extends Component {
     constructor(params) {
         super();
         this.desc = params.desc;

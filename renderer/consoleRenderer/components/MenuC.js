@@ -1,6 +1,6 @@
 let BaseConsoleRendererComponents = require('../BaseConsoleRendererComponents.js');
 
-module.exports = class Logs extends BaseConsoleRendererComponents {
+module.exports = class MenuC extends BaseConsoleRendererComponents {
     constructor(
         pos,
         size,

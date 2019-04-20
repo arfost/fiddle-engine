@@ -1,4 +1,6 @@
-class Combat extends Component {
+const Component = require('../Component.js')
+
+module.exports = class Combat extends Component {
     constructor(params) {
         super();
         this.canBeAttacked = true;

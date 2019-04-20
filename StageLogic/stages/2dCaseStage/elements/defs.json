@@ -1,0 +1,48 @@
+{
+    "vieu":[
+        {
+            "type":"dialogs",
+            "params":"../../../../../refs/dialogs/test.json"
+        },
+        {
+            "type":"baseApparence",
+            "params":{
+                "desc": "Un vieux tout pourri",
+                "name": "un vieux"
+            }
+        }
+    ],
+    "player":[
+        {
+            "type":"baseApparence",
+            "params":{
+                "desc": "Peau mate, yeux verts, cheveux noirs, 1.90 mètres, une beauté au diapason de ses origines semi-démoniaques",
+                "name": "Vous"
+            }
+        },
+        {
+            "type":"combat"
+        },
+        {
+            "type":"baseStats"
+        }
+    ],
+    "gobelin":[
+        {
+            "type":"baseApparence",
+            "params":{
+                "desc": "Un horrible gobelin. Il semble paralysé, ou trop idiot pour bouger, vous n'etes pas sur ",
+                "name": "Gornog"
+            }
+        },
+        {
+            "type":"combat"
+        },
+        {
+            "type":"baseStats"
+        },
+        {
+            "type":"ia"
+        }
+    ]
+}

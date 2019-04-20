@@ -1,4 +1,4 @@
-class Component {
+module.exports = class Component {
     getAction(against) {
         return [];
     }
