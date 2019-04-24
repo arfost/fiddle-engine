@@ -116,12 +116,13 @@ module.exports = class BaseRendererComponent {
         return newArray;
     }
 
-    decorateLine(line, decoration) {
+    decorateLine(line, decoration, decorationR = decoration) {
         if (!decoration || typeof decoration === "number") { //because map send index.
             decoration = this.decoration;
+            decorationR  = decoration;
         }
         return line
-            .replace(/.$/, decoration)
+            .replace(/.$/, decorationR)
             .replace(/^./, decoration);
     }
 

@@ -50,7 +50,7 @@ module.exports = class MenuC extends BaseConsoleRendererComponents {
      * @param {String[]} infos - array of string to draw
      */
     getThingTodraw(actions) {
-        let rows = this.size.rows - 2;
+        let rows = this.size.rows - 1;
         let lines = []
         if (actions.length > rows) {
             lines.push("error to much options")
@@ -62,8 +62,9 @@ module.exports = class MenuC extends BaseConsoleRendererComponents {
             actions[this.index].key = "d";
         }
         lines = this.centerHLine(lines, rows);
-        lines.unshift(this.newDecorationLine());
-        lines.push(" - z,s to navigate, d to validate -  ".padStart(this.size.columns, this.decoration));
-        return lines.map(this.centerLine.bind(this)).map(this.decorateLine.bind(this));
+        lines = lines.map(this.centerLine.bind(this)).map(l=>this.decorateLine(l, "║"))
+        //lines.unshift(this.newDecorationLine(undefined, "═"));
+        lines.push(this.decorateLine(" - z,s to navigate, d to validate -  ".padStart(this.size.columns, "═"), "╚", "╝"));
+        return lines;
     }
 };

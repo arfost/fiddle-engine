@@ -78,7 +78,7 @@ module.exports = class ActionsC extends BaseConsoleRendererComponents {
      */
     getThingTodraw(actions) {
 
-        let formattedActions = [("  Actions : " + this.selectedCatName).padEnd(this.size.columns), this.centerLine("=".repeat(this.size.columns * 0.6))];
+        let formattedActions = [("  Actions : " + this.selectedCatName).padEnd(this.size.columns), this.centerLine("═".repeat(this.size.columns * 0.6))];
         this.actionKeys = [];
         let idCatAdded = [];
         let keys = JSON.parse(JSON.stringify(this.vrac));
@@ -108,7 +108,7 @@ module.exports = class ActionsC extends BaseConsoleRendererComponents {
             }
         }
         //key draw
-        formattedActions.push(this.centerLine("=".repeat(this.size.columns * 0.6)));
+        formattedActions.push(this.centerLine("═".repeat(this.size.columns * 0.6)));
         for (let action of this.actionKeys) {
             if (action.forComponent) {
                 formattedActions.push(`  - ${action.key} : ${action.name}`.padEnd(this.size.columns));
@@ -119,9 +119,11 @@ module.exports = class ActionsC extends BaseConsoleRendererComponents {
         while (formattedActions.length < this.size.rows - 2) {
             formattedActions.push(" ".repeat(this.size.columns));
         }
-        formattedActions.unshift(this.newDecorationLine());
-        formattedActions.push(this.newDecorationLine());
+        formattedActions = formattedActions.map(l=>this.decorateLine(l, "║"))
 
-        return formattedActions.map(this.decorateLine.bind(this));
+        formattedActions.unshift(this.decorateLine(this.newDecorationLine(undefined,  "═"), "╔", "╣"));
+        formattedActions.push(this.decorateLine(this.newDecorationLine(undefined,  "═"), "╩", "╣"));
+
+        return formattedActions;
     }
 }

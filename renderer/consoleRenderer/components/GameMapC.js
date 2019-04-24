@@ -12,8 +12,8 @@ module.exports = class GameMapC extends BaseConsoleRendererComponents {
 
     get affChars() {
         return {
-            bordureVisualHori: '=',
-            bordureVisualVerti: '|',
+            bordureVisualHori: '═',
+            bordureVisualVerti: '║',
         };
     }
 
@@ -133,7 +133,7 @@ module.exports = class GameMapC extends BaseConsoleRendererComponents {
         while (base.length < this.size.rows - 1) {
             base.push(this.decorateLine(' '.repeat(this.doubled ? this.size.columns * 2 - 2 : this.size.columns - 1), this.affChars['bordureVisualVerti'] + this.affChars['bordureVisualVerti']));
         }
-        base.push(this.newDecorationLine(this.doubled ? this.size.columns * 2 : this.size.columns, '*'));
+        base.push(this.newDecorationLine(this.doubled ? this.size.columns * 2 : this.size.columns, '═'));
 
         return base;
     }

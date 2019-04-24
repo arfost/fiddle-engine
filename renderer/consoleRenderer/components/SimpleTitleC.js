@@ -20,11 +20,11 @@ module.exports = class SimpleTitleC extends BaseConsoleRendererComponents {
         }
 
         part = this.centerHLine(
-            part.map(this.centerLine.bind(this)).map(this.decorateLine.bind(this)),
+            part.map(this.centerLine.bind(this)).map(l=>this.decorateLine(l, "║")),
             this.size.rows - 2
         );
-        part.unshift(this.newDecorationLine());
-        part.push(this.newDecorationLine());
+        part.unshift(this.decorateLine(this.newDecorationLine(undefined, "═"), "╔", "╗"));
+        part.push(this.decorateLine(this.newDecorationLine(undefined, "═"), "╠", "╣"));
 
         return part;
     }

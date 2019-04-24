@@ -64,8 +64,9 @@ module.exports = class LogsC extends BaseConsoleRendererComponents {
             tranLines.push(" ".repeat(this.size.columns));
         }
         tranLines = tranLines.slice(0, rows);
-        tranLines.unshift(this.newDecorationLine());
-        tranLines.push((" - press x and c to defile(" + this.index + ") -  ").padStart(this.size.columns, this.decoration));
-        return tranLines.map(this.decorateLine.bind(this));
+        tranLines = tranLines.map(l=>this.decorateLine(l, "║"));
+        tranLines.unshift(this.decorateLine(this.newDecorationLine(undefined, "═"), "╠", "╣"));
+        tranLines.push(this.decorateLine((" - press x and c to defile(" + this.index + ") -  ").padStart(this.size.columns, "═"), "╚", "╝"));
+        return tranLines
     }
 };
