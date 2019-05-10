@@ -1,19 +1,17 @@
-const cFactory = require('./ComponentsFactory.js')
-const entitiesDefinition = require('./defs.json')
+const cFactory = require('./ComponentsFactory.js');
+const entitiesDefinition = require('./defs.json');
 
-module.exports = function (entityParams) {
+module.exports = function(entityParams) {
     let definition = entitiesDefinition[entityParams.type];
-    if(!definition){
-        throw new Error("unknow entity definition "+entityParams.type)
+    if (!definition) {
+        throw new Error('unknow entity definition ' + entityParams.type);
     }
     let entity = new Entity(entityParams);
-    for(let comp of definition){
-        entity.addComponent(cFactory(comp.type, comp.params))
+    for (let comp of definition) {
+        entity.addComponent(cFactory(comp.type, comp.params));
     }
     return entity;
 };
-
-
 
 class Entity {
     constructor(entity) {
@@ -36,11 +34,11 @@ class Entity {
 
     addStat(stat) {
         Object.defineProperty(this._stats, stat, {
-            get: function () {
-                return this.emit("get_" + stat, "");
+            get: function() {
+                return this.emit('get_' + stat);
             }.bind(this),
             configurable: true,
-            enumerable: true
+            enumerable: true,
         });
     }
 
@@ -70,7 +68,7 @@ class Entity {
 
     addComponent(component) {
         if (this.components.has(component)) {
-            throw new Error("this entity already have this component");
+            throw new Error('this entity already have this component');
         } else {
             this.components.add(component);
             component.addEntity(this);
@@ -79,18 +77,24 @@ class Entity {
 
     removeComponent(component) {
         if (!this.components.has(component)) {
-            throw new Error("this entity doesn't have this component");
+            throw new Error('this entity doesn\'t have this component');
         } else {
             this.components.delete(component);
         }
     }
 
-    getPossibleActionsFor(entity) {
-        let actions = [];
-        for (let component of this.components.values()) {
-            actions = actions.concat(component.getAction(entity));
+    prepareForTurn(stageValuesAccessor) {
+        this.emit('turn-passif', stageValuesAccessor);
+        let eventResult = this.emit('collect-actions', { stageValuesAccessor: stageValuesAccessor, actions: [] });
+        this.turnActions = eventResult.actions;
+        this.emit('turn-end', stageValuesAccessor);
+    }
+
+    addActionForTurn(actions) {
+        if (!Array.isArray(actions)) {
+            actions = [actions];
         }
-        return actions;
+        this.turnActions = [...this.turnActions, ...actions];
     }
 
     get infos() {

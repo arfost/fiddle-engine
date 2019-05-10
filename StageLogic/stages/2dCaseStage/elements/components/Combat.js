@@ -1,77 +1,52 @@
-const Component = require('../Component.js')
+const Component = require('../Component.js');
 
 module.exports = class Combat extends Component {
-    constructor(params) {
+    constructor() {
         super();
-        this.canBeAttacked = true;
-        this.canAttack = true;
+        this.attackRange = 1;
     }
 
     get statsToAdd() {
-        return ["canBeAttacked", "canAttack"];
+        return ['canBeAttacked', 'canAttack', 'attackRange'];
     }
 
-    getAction(against) {
-        let actions = [];
-        let isNear =
-            Math.abs(this.entity.pos.x - against.pos.x) +
-            Math.abs(this.entity.pos.y - against.pos.y) ===
-            1;
-        if (against.stats.canBeAttacked && this.canAttack && isNear) {
-            actions.push({
-                name: "attack : " + this.entity.stats.name,
-                id: "atk:norm",
-                pos: against.pos,
-                execute: (stage, content, player) => {
-                    stage.logGameAction.push(
-                        String(
-                            against.stats.name +
-                            " attack " +
-                            this.entity.stats.name
-                        )
-                    );
-                    let attackScore =
-                        Number(against.stats.physique) + stage.getDice(1, 6);
-                    let defenseScore =
-                        Number(this.entity.stats.physique) +
-                        stage.getDice(1, 6);
-                    stage.logGameAction.push(
-                        String(
-                            attackScore +
-                            " attack against " +
-                            defenseScore +
-                            " defense"
-                        )
-                    );
-                    let degat = attackScore - defenseScore;
-                    if (degat > 0) {
-                        stage.logGameAction.push(
-                            String(
-                                this.entity.stats.name +
-                                " is touched and take " +
-                                degat +
-                                " damage(s)"
-                            )
-                        );
-                        this.entity.emit("damage", {
-                            damage: degat
-                        });
-                        if (this.entity.stats.health <= 0) {
-                            stage.logGameAction.push(
-                                String(this.entity.stats.name + " is dead")
-                            );
-                        }
-                    } else {
-                        stage.logGameAction.push(
-                            String(
-                                this.entity.stats.name +
-                                " totaly esquive the attack"
-                            )
-                        );
-                    }
-                }
-            });
-        }
-        return actions;
+    get canBeAttacked() {
+        return !this.entity.stats.isDead;
     }
-}
+    get canAttack() {
+        return !this.entity.stats.isDead;
+    }
+
+    getAction({ stageValuesAccessor, actions }) {
+        let close = stageValuesAccessor.closeEntityAccessor(this.entity.pos, this.entity.stats.attackRange);
+        for (let potentialFoe of close) {
+            if (potentialFoe.stats.canBeAttacked && this.entity.stats.canAttack && this.entity !== potentialFoe) {
+                actions.push({
+                    name: 'attack : ' + potentialFoe.stats.name,
+                    id: 'atk:norm',
+                    pos: potentialFoe.pos,
+                    execute: () => {
+                        stageValuesAccessor.pushToLog(this.entity.stats.name + ' attack ' + potentialFoe.stats.name);
+                        let attackScore = Number(this.entity.stats.physique) + stageValuesAccessor.getDice(1, 6);
+                        let defenseScore = Number(potentialFoe.stats.physique) + stageValuesAccessor.getDice(1, 6);
+                        stageValuesAccessor.pushToLog(attackScore + ' attack against ' + defenseScore + ' defense');
+                        let degat = attackScore - defenseScore;
+                        if (degat > 0) {
+                            stageValuesAccessor.pushToLog(potentialFoe.stats.name + ' is touched and take ' + degat + ' damage(s)');
+                            potentialFoe.emit('damage', {
+                                damage: degat,
+                            });
+                            if (potentialFoe.stats.health <= 0) {
+                                stageValuesAccessor.pushToLog(potentialFoe.stats.name + ' is dead');
+                                potentialFoe.emit('killed-by', this.entity);
+                            }
+                        } else {
+                            stageValuesAccessor.pushToLog(potentialFoe.stats.name + ' totaly esquive the attack');
+                        }
+                    },
+                });
+            }
+        }
+        return { stageValuesAccessor, actions };
+    }
+};

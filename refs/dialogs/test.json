@@ -2,38 +2,47 @@
     "steps": {
         "base": {
             "text": "",
-            "replis": [{
-                "text": "Bonjour vieil homme",
-                "code": "gr",
-                "next": "good"
-            }, {
-                "text": "Moi j'aime pas trop les vieux",
-                "code": "bd",
-                "next": "bad"
-            }]
+            "replis": [
+                {
+                    "text": "Bonjour vieil homme",
+                    "code": "gr",
+                    "next": "good"
+                },
+                {
+                    "text": "Moi j'aime pas trop les vieux",
+                    "code": "bd",
+                    "next": "bad"
+                }
+            ]
         },
         "good": {
             "text": "Merci jeune personne, bonjour a vous aussi. Pourriez vous me rendre un service",
-            "replis": [{
-                "text": "Bien sur, que puis-je faire pour vous ?",
-                "code": "qe",
-                "next": "quest"
-            }, {
-                "text": "Je veux bien dire bonjour, mais faut pas pousser le bouchon trop loin",
-                "code": "bd",
-                "next": "bad"
-            }]
+            "replis": [
+                {
+                    "text": "Bien sur, que puis-je faire pour vous ?",
+                    "code": "qe",
+                    "next": "quest"
+                },
+                {
+                    "text": "Je veux bien dire bonjour, mais faut pas pousser le bouchon trop loin",
+                    "code": "bd",
+                    "next": "bad"
+                }
+            ]
         },
         "bad": {
             "text": "Et bien allez au diable",
             "replis": [],
-            "events": [{
-                "text": "Vous jette une pomme pourrie au visage... ça fait mal",
-                "name": "damage",
-                "params": {
-                    "damage": 2
+            "events": [
+                {
+                    "name": "damage",
+                    "params": {
+                        "damage": 2,
+                        "cause": "une pomme lancée"
+                    },
+                    "text": "vous lance une pomme pourrie au visage, ça fait mal"
                 }
-            }]
+            ]
         },
         "quest": {
             "text": "Merci, alors je vous explique. Il ya un gobelin plus loin au nord, j'aimerais bien que vous le tuiez. Seulement ce ne sera pas possible avant la prochaine version donc revenez me voir plus tard.",
