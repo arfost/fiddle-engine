@@ -39,13 +39,20 @@
             }
         },
         {
-            "type": "baseStats"
+            "type": "baseStats",
+            "params": {
+                "physique": 3
+            }
         },
         {
             "type": "combat"
         },
         {
             "type": "ia"
+        },
+        {
+            "type": "questreward",
+            "params": "gobKilled"
         }
     ]
 }

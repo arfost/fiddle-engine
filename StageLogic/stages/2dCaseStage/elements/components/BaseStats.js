@@ -1,27 +1,39 @@
 const Component = require('../Component.js');
 module.exports = class BaseStats extends Component {
-    constructor() {
+    constructor(params = {}) {
         super();
-        this.physique = 5;
-        this.mental = 5;
-        this.health = 5;
-        this.deplacement = 2;
+        this.physique = params.physique || 5;
+        this.mental = params.mental || 5;
+        this.health = params.health || 5;
+        this.deplacement = params.deplacement || 2;
+        this.flag = params.flag || {};
         this.isDead = false;
     }
 
     get statsToAdd() {
-        return ['physique', 'mental', 'desc', 'perception', 'deplacement', 'health', 'isDead'];
+        return ['physique', 'mental', 'desc', 'perception', 'deplacement', 'health', 'isDead', 'flag'];
     }
 
     get eventsToSubscribe() {
         return [
             {
                 name: 'killed-by',
-                handler: () => {
-                    console.log('im dead so sad');
+                handler: killer => {
                     this.isDead = true;
                     this.entity._img = this.entity._img + '-dead';
-                    console.log(this.entity.img);
+                    return killer;
+                },
+            },
+            {
+                name: 'receive-flag',
+                handler: flag => {
+                    this.flag[flag] = true;
+                },
+            },
+            {
+                name: 'remove-flag',
+                handler: flag => {
+                    this.flag[flag] = false;
                 },
             },
             {

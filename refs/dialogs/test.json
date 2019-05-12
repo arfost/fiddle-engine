@@ -45,7 +45,48 @@
             ]
         },
         "quest": {
-            "text": "Merci, alors je vous explique. Il ya un gobelin plus loin au nord, j'aimerais bien que vous le tuiez. Seulement ce ne sera pas possible avant la prochaine version donc revenez me voir plus tard.",
+            "text": "Merci, alors je vous explique. Il ya un gobelin plus loin au nord, j'aimerais bien que vous le tuiez. Revenez me voir une fois que c'est fait.",
+            "replis": [
+                {
+                    "text": "Tres bien, je reviens tout de suite",
+                    "code": "qea",
+                    "next": "quest-accepted"
+                },
+                {
+                    "text": "Ah bah ça fait un peu peur quand meme, je prefere pas.",
+                    "code": "bda",
+                    "next": "bad"
+                }
+            ]
+        },
+        "quest-accepted": {
+            "text": "Prenez soin de vous.",
+            "replis": [
+                {
+                    "text": "Finalement, demerdez vous",
+                    "code": "refu",
+                    "next": "bad"
+                },
+                {
+                    "text": "Ou est le gobelin deja ?",
+                    "code": "idio",
+                    "next": "quest"
+                },
+                {
+                    "text": "C'est fait grand pere",
+                    "code": "done",
+                    "next": "recomp",
+                    "conditions": [
+                        {
+                            "type": "flag",
+                            "params": "gobKilled"
+                        }
+                    ]
+                }
+            ]
+        },
+        "recomp": {
+            "text": "Felicitation jeune homme, vous avez ainsi fini le jeu. Bientot plus de contenu.",
             "replis": []
         }
     },

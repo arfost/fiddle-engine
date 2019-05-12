@@ -10,7 +10,7 @@ module.exports.DialogAnswerer = class DialogAnswerer extends Component {
         this._steps = params.steps;
     }
 
-    get isDialogAnswerer(){
+    get isDialogAnswerer() {
         return true;
     }
 
@@ -18,27 +18,28 @@ module.exports.DialogAnswerer = class DialogAnswerer extends Component {
         return ['desc', 'isDialogAnswerer', 'steps'];
     }
 
-    get steps(){
+    get steps() {
         return this._steps;
     }
 
     get eventsToSubscribe() {
-        return [{
-            name: 'dia-answer',
-            handler: e => {
-                e.outCanal(this.entity.stats.name + ' say : ' + this.steps[e.step].text);
-                if (this.steps[e.step].events) {
-                    for (let event of this.steps[e.step].events) {
-                        e.sayBy.emit(event.name, event.params);
-                        e.outCanal(this.entity.stats.name + ' ' + event.text);
+        return [
+            {
+                name: 'dia-answer',
+                handler: e => {
+                    e.outCanal(this.entity.stats.name + ' say : ' + this.steps[e.step].text);
+                    if (this.steps[e.step].events) {
+                        for (let event of this.steps[e.step].events) {
+                            e.sayBy.emit(event.name, event.params);
+                            e.outCanal(this.entity.stats.name + ' ' + event.text);
+                        }
                     }
-                }
-                return null;
-            }
-        }];
+                    return null;
+                },
+            },
+        ];
     }
 };
-
 
 module.exports.DialogsInitiator = class DialogsInitiator extends Component {
     constructor() {
@@ -46,30 +47,49 @@ module.exports.DialogsInitiator = class DialogsInitiator extends Component {
         this.steps = {};
     }
 
-    getAction({stageValuesAccessor, actions}) {
+    passConditions(conditions) {
+        let retour = true;
+        for (let i = 0; i < conditions.length && retour; i++) {
+            let condition = conditions[i];
+            let method = this.getConditionMethod(condition.type);
+            retour = method(condition.params);
+        }
+        return retour;
+    }
+
+    getConditionMethod(type) {
+        switch (type) {
+        case 'flag':
+            return flagName => this.entity.stats.flag[flagName];
+        }
+    }
+
+    getAction({ stageValuesAccessor, actions }) {
         let entities = stageValuesAccessor.closeEntityAccessor(this.entity.pos, DIALOG_MAXIMAL_RANGE);
         for (let entity of entities) {
             if (entity.stats.isDialogAnswerer) {
                 let dialogStepForDialog = this.steps[entity.id] ? this.steps[entity.id] : 'base';
                 let stepForCurrentEntity = entity.stats.steps[dialogStepForDialog];
                 for (let repli of stepForCurrentEntity.replis) {
-                    actions.push({
-                        name: 'say : ' + repli.text,
-                        id: 'say:' + dialogStepForDialog + ':' + repli.code,
-                        pos: entity.pos,
-                        execute: () => {
-                            stageValuesAccessor.pushToLog(this.entity.stats.name + ' say : ' + repli.text);
-                            this.steps[entity.id] = repli.next;
-                            entity.emit('dia-answer', {
-                                step: repli.next,
-                                sayBy:this.entity,
-                                outCanal:stageValuesAccessor.pushToLog
-                            });
-                        },
-                    });
+                    if (!repli.conditions || this.passConditions(repli.conditions)) {
+                        actions.push({
+                            name: 'say : ' + repli.text,
+                            id: 'say:' + dialogStepForDialog + ':' + repli.code,
+                            pos: entity.pos,
+                            execute: () => {
+                                stageValuesAccessor.pushToLog(this.entity.stats.name + ' say : ' + repli.text);
+                                this.steps[entity.id] = repli.next;
+                                entity.emit('dia-answer', {
+                                    step: repli.next,
+                                    sayBy: this.entity,
+                                    outCanal: stageValuesAccessor.pushToLog,
+                                });
+                            },
+                        });
+                    }
                 }
             }
         }
-        return {stageValuesAccessor, actions};
+        return { stageValuesAccessor, actions };
     }
 };

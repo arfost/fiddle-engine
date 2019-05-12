@@ -11,8 +11,8 @@ module.exports = class GameStage {
         this.addEntity(
             createEntityFromDesc({
                 pos: {
-                    x: 7,
-                    y: 3,
+                    x: 9,
+                    y: 23,
                 },
                 type: 'player',
                 img: 'player',
@@ -22,7 +22,7 @@ module.exports = class GameStage {
             createEntityFromDesc({
                 pos: {
                     x: 5,
-                    y: 3,
+                    y: 23,
                 },
                 type: 'vieu',
                 img: 'vieu',
@@ -31,8 +31,8 @@ module.exports = class GameStage {
         this.addEntity(
             createEntityFromDesc({
                 pos: {
-                    x: 3,
-                    y: 0,
+                    x: 9,
+                    y: 4,
                 },
                 type: 'gobelin',
                 img: 'gob',

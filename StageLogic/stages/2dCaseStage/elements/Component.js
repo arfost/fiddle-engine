@@ -1,5 +1,6 @@
 module.exports = class Component {
     constructor() {}
+
     get eventsToSubscribe() {
         return [];
     }
@@ -23,12 +24,17 @@ module.exports = class Component {
                 'get_' + statToAdd,
                 function(event) {
                     let data = this[statToAdd];
-                    switch(typeof event){
-                    case 'undefined': return data;
-                    case 'string': return (event + data);
-                    case 'number': return (event + data);
-                    case 'object': return {...event, ...data};
-                    case 'array': return [...event, ...data];
+                    switch (typeof event) {
+                    case 'undefined':
+                        return data;
+                    case 'string':
+                        return event + data;
+                    case 'number':
+                        return event + data;
+                    case 'object':
+                        return { ...event, ...data };
+                    case 'array':
+                        return [...event, ...data];
                     }
                 }.bind(this)
             );
