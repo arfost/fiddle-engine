@@ -1,6 +1,6 @@
 {
   "name": "fiddle-engine",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "a small rogue game engine, an experiment",
   "main": "index.js",
   "scripts": {
