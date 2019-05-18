@@ -67,8 +67,6 @@ module.exports = class GameMapC extends BaseConsoleRendererComponents {
      * @param {Object} infos - reference of entities and position to draw
      */
     getThingTodraw(infos) {
-        console.log('=========');
-        console.log(infos);
         let doubled = this.doubled ? ' ' : '';
         let columns = this.size.columns - 2;
         let rows = this.size.rows - 7;

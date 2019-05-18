@@ -25,6 +25,7 @@ module.exports = class Combat extends Component {
                     name: 'attack : ' + potentialFoe.stats.name,
                     id: 'atk:norm',
                     pos: potentialFoe.pos,
+                    faction:potentialFoe.type,
                     execute: () => {
                         stageValuesAccessor.pushToLog(this.entity.stats.name + ' attack ' + potentialFoe.stats.name);
                         let attackScore = Number(this.entity.stats.physique) + stageValuesAccessor.getDice(1, 6);

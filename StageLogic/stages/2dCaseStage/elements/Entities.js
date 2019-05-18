@@ -18,7 +18,7 @@ class Entity {
         this.pos = entity.pos;
         this._img = entity.img;
         this.type = entity.type;
-        this.id = this.type;
+        this.id = entity.id;
         this.components = new Set();
         this._stats = {};
         this._events = {};

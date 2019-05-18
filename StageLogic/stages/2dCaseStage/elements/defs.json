@@ -41,7 +41,7 @@
         {
             "type": "baseStats",
             "params": {
-                "physique": 3
+                "physique": 2
             }
         },
         {
@@ -49,10 +49,24 @@
         },
         {
             "type": "ia"
-        },
+        }
+    ],
+    "shrine": [
         {
-            "type": "questreward",
-            "params": "gobKilled"
+            "type": "baseApparence",
+            "params": {
+                "desc": "Une fontaine mystique et etrange",
+                "name": "Fontaine mystique"
+            }
+        }
+    ],
+    "wall": [
+        {
+            "type": "baseApparence",
+            "params": {
+                "desc": "Un mur, solide et impassable",
+                "name": "Mur"
+            }
         }
     ]
 }

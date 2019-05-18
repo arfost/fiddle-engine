@@ -1,17 +1,17 @@
-let stageFactory = require('./StageLogic/StageFactory.js')
+let stageFactory = require('./StageLogic/StageFactory.js');
 module.exports = class Game {
 
     constructor(Renderer) {
-        this.renderer = new Renderer(require("./renderer/consoleRenderer/ScreenDesc.json"), "game");
+        this.renderer = new Renderer(require('./renderer/consoleRenderer/ScreenDesc.json'), 'game');
         this.TICK_RATE = 20;
         this.tick = 0;
         this.previous = this.hrtimeMs();
         this.tickLengthMs = 1000 / this.TICK_RATE;
 
-        this.gameInfos = "super titre";
+        this.gameInfos = 'super titre';
         this.savedStages = {};
 
-        this.saveCurrentStageAndChange("first", "menu");
+        this.saveCurrentStageAndChange('first', 'menu');
     }
 
     start() {
@@ -60,7 +60,7 @@ module.exports = class Game {
                 this.currentStage = this.savedStages[newStage];
                 this.renderer.changeCurrentScreen(newStage);
             } else {
-                throw new Error("no such stage : " + newStage);
+                throw new Error('no such stage : ' + newStage);
             }
         }
     }

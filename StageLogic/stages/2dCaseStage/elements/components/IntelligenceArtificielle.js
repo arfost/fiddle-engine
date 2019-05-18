@@ -12,7 +12,7 @@ module.exports = class IntelligenceArtificielle extends Component {
                 handler: () => {
                     let selectedAction;
                     for (let action of this.entity.turnActions) {
-                        if (action.id === 'atk:norm') {
+                        if (action.id === 'atk:norm' && action.faction != this.entity.type) {
                             selectedAction = action;
                         }
                     }

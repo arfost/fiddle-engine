@@ -1,4 +1,4 @@
-const createEntityFromDesc = require('./elements/Entities.js');
+
 module.exports = class GameStage {
     constructor(game) {
         this.game = game;
@@ -7,37 +7,9 @@ module.exports = class GameStage {
         this.posEntities = [];
         this.entities = [];
         this.logGameAction = ['Vous entrez dans le stage de test'];
+    }
 
-        this.addEntity(
-            createEntityFromDesc({
-                pos: {
-                    x: 9,
-                    y: 23,
-                },
-                type: 'player',
-                img: 'player',
-            })
-        );
-        this.addEntity(
-            createEntityFromDesc({
-                pos: {
-                    x: 5,
-                    y: 23,
-                },
-                type: 'vieu',
-                img: 'vieu',
-            })
-        );
-        this.addEntity(
-            createEntityFromDesc({
-                pos: {
-                    x: 9,
-                    y: 4,
-                },
-                type: 'gobelin',
-                img: 'gob',
-            })
-        );
+    init(){
         for (let entity of this.entities) {
             entity.prepareForTurn(this.accessors);
         }

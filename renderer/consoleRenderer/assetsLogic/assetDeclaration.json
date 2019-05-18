@@ -2,7 +2,13 @@
     "vieu": [["o", "O"], "blue"],
     "player": [["@", "a"], "yellow"],
     "player-dead": [["@", "a"], "red"],
-    "gob": [["$", "S"], "green"],
-    "gob-dead": [["$", "S"], "red"],
-    "base": [["."], "#666"]
+    "gob": [["g"], "green"],
+    "gob-dead": [["g"], "red"],
+    "biggob": [["G"], "green"],
+    "biggob-dead": [["G"], "red"],
+    "base": [["."], "#666"],
+    "wall": [["#"], "white"],
+    "door-open": [[";"], "#666"],
+    "door-close": [[":"], "#666"],
+    "shrine": [["v"], "blue"]
 }
