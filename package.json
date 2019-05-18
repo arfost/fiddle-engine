@@ -11,6 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/arfost/fiddle-engine.git"
   },
+  "bin": "build-entry.js",
   "keywords": [
     "roguelike",
     "game",
@@ -25,5 +26,8 @@
   "devDependencies": {
     "eslint": "^5.16.0",
     "pkg": "^4.3.7"
+  },
+  "pkg": {
+    "assets": "./refs/**/*"
   }
 }

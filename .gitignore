@@ -71,3 +71,6 @@ build-entry-macos
 
 .scannerwork/
 spt
+fiddle-engine-linux
+fiddle-engine-macos
+fiddle-engine-win.exe
